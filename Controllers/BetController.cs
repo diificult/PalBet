@@ -1,0 +1,34 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using PalBet.Dtos;
+using PalBet.Interfaces;
+using PalBet.Mappers;
+using PalBet.Services;
+
+namespace PalBet.Controllers
+{
+    [Route("api/Bet")]
+    public class BetController : ControllerBase
+    {
+
+
+        private readonly IBetService _betService;
+
+        public BetController(IBetService bs)
+        {
+            _betService = bs;
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> CreateNewBet([FromBody] CreateBetDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var bet = await _betService.CreateBet(dto);
+            if (bet != null)
+                return Created();
+            else return StatusCode(500, "Could not create");
+        }
+    }
+}
