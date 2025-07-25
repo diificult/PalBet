@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PalBet.Models;
 
@@ -27,7 +28,20 @@ namespace PalBet.Data
                 .HasOne(bp => bp.appUser)
                 .WithMany(u => u.BetsParticipation)
                 .HasForeignKey(bp => bp.appUserId);
-
+            builder.Entity<IdentityRole>().HasData(
+              new IdentityRole
+              {
+                  Id = "1",
+                  Name = "Admin",
+                  NormalizedName = "ADMIN",
+              },
+              new IdentityRole
+              {
+                  Id = "2",
+                  Name = "User",
+                  NormalizedName = "USER",
+              }
+          );
         }
     }
 }
