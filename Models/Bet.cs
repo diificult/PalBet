@@ -7,10 +7,11 @@ namespace PalBet.Models
         public int Id { get; set; }
         public ICollection<BetParticipant> Participants { get; set; } = new List<BetParticipant>();
         public string BetDescription { get; set; }
-        //1 or 2
-        public int UserWinner { get; set; }
+        public string UserWinner { get; set; }
         public BetState state { get; set; }
         public int BetStake { get; set; }
+
+        //TODO??? Bet start datetime, bet deadline.
 
     }
 }

@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PalBet.Dtos;
 using PalBet.Interfaces;
 using PalBet.Mappers;
 using PalBet.Services;
 using PalBet.Extensions;
 using Microsoft.AspNetCore.Identity;
 using PalBet.Models;
+using PalBet.Dtos.Bet;
+using PalBet.Enums;
 
 namespace PalBet.Controllers
 {
@@ -28,7 +29,7 @@ namespace PalBet.Controllers
         [Authorize]
         public async Task<IActionResult> CreateNewBet([FromBody] CreateBetDto dto)
         {
-
+            //Todo put these two lines into a seperate bit
             var Username = User.GetUsername();
             var appUser = await _userManager.FindByNameAsync(Username);
             dto.ParticipantIds.Add(appUser.Id);
@@ -66,12 +67,26 @@ namespace PalBet.Controllers
         [HttpPut("ChooseWinner")]
         [Authorize]
 
-        public async Task<IActionResult> ChooseWinner(int betId, int userId)
+        public async Task<IActionResult> ChooseWinner(int betId, string userId)
         {
             var Username = User.GetUsername();
             var AppUser = await _userManager.FindByNameAsync(Username);
+
+            var winner = await _betService.SetWinner(userId, AppUser.Id, betId);
+
+            if (winner) return Ok();
+            return BadRequest();
         }
 
+        [HttpGet("GetBetFromState")]
+        [Authorize]
+        public async Task<IActionResult> GetBetFromState([FromQuery] BetState? state)
+        {
+            var Username = User.GetUsername();
+            var AppUser = await _userManager.FindByNameAsync(Username);
+
+            var bets = await _betService.GetBetsByState(AppUser.Id, state);
+        }
 
     }
 }

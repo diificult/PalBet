@@ -11,5 +11,9 @@ namespace PalBet.Interfaces
         Task<List<Bet>?> GetRequestedBets(string userId);
         Task<Bet?> GetByIdAsync(int id);
         Task<Bet> AcceptBet(int betId, string userId);
+
+        Task<List<Bet>?> GetUsersBets(string userId);
+
+        Task SaveAsync();
     }
 }

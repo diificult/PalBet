@@ -50,6 +50,14 @@ namespace PalBet.Repository
             throw new NotImplementedException();
         }
 
+        public async Task<List<Bet>?> GetUsersBets(string userId)
+        {
+            return await _context.bets.Where(b => b.Participants.Any(p => p.appUserId == userId && p.Accepted)).ToListAsync();
+        }
 
+        public async Task SaveAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }

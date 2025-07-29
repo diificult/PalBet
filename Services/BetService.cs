@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PalBet.Dtos;
+using PalBet.Dtos.Bet;
 using PalBet.Enums;
 using PalBet.Interfaces;
 using PalBet.Models;
@@ -42,11 +42,12 @@ namespace PalBet.Services
             }
 
             betParticipant.Accepted = true;
+            await _betRepository.SaveAsync();
 
-            var updatedBet = await _betRepository.AcceptBet(betId, userId);
 
-            if (updatedBet != null) return true;
-            return false;
+            //TODO: Check to see if the bet has been accepted by everyone.
+
+            return true;
             
 
         }
@@ -83,9 +84,44 @@ namespace PalBet.Services
             return await _betRepository.GetBetRequests(userId);
         }
 
+        public async Task<List<Bet>?> GetBetsByState(string userId, BetState? betState)
+        {
+            var bets = await _betRepository.GetUsersBets(userId);
+            if (betState == null) return null;
+            return bets.Where(b => b.state == betState).ToList();
+        }
+
         public Task<List<Bet>?> GetRequestedBets(string userId)
         {
             return _betRepository.GetRequestedBets(userId);
+        }
+
+        public async Task<bool> SetWinner(string winnerUserId, string updaterUserId, int betId)
+        {
+            var bet = await _betRepository.GetByIdAsync(betId);
+
+            //Check to see if the person updating it is the person who should be.
+
+            if (!bet.Participants.FirstOrDefault(p => p.appUserId == updaterUserId).isBetHost) return false;
+
+            //Check to see if the bet is still in play.
+            if (bet.state != BetState.InPlay) return false;
+
+            //Check to see if the winner id exists in the bet
+            if (!bet.Participants.Any(p => p.appUserId == winnerUserId)) return false;
+
+            //Otherwise update the bet
+
+            bet.UserWinner = winnerUserId;
+            bet.state = BetState.Completed;
+
+            await _betRepository.SaveAsync();
+
+            return true;
+            
+
+
+
         }
     }
 

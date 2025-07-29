@@ -1,4 +1,5 @@
-﻿using PalBet.Dtos;
+﻿using PalBet.Dtos.Bet;
+using PalBet.Enums;
 using PalBet.Models;
 
 namespace PalBet.Interfaces
@@ -10,7 +11,10 @@ namespace PalBet.Interfaces
         Task<List<Bet>?> GetBetRequests(string userId);
         //Gets the bets that you have requested.
         Task<List<Bet>?> GetRequestedBets(string userId);
-        //Accept a bet
+        //Allows a user to accept a bet
         Task<bool> AcceptBet(string userId, int betId);
+        //Choose winner
+        Task<bool> SetWinner(string winnerUserId, string updaterUserId, int betId);
+        Task<List<Bet>?> GetBetsByState(string userId, BetState? betState);
     }
 }
