@@ -3,6 +3,7 @@
     public enum BetState
     {
         NotStarted,
+        Requested,
         InPlay,
         Completed,
     }
