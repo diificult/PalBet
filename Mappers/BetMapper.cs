@@ -1,5 +1,5 @@
 ﻿using Azure.Core;
-using PalBet.Dtos;
+using PalBet.Dtos.Bet;
 using PalBet.Enums;
 using PalBet.Models;
 

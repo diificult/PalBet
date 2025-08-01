@@ -11,10 +11,12 @@ namespace PalBet.Services
     {
 
         public readonly IBetRepository _betRepository;
+        public readonly IAppUserRepository _userRepository;
 
-        public BetService(IBetRepository betRepository)
+        public BetService(IBetRepository betRepository, IAppUserRepository appUserRepository)
         {
             _betRepository = betRepository;
+            _userRepository = appUserRepository;
         }
 
         public async Task<bool> AcceptBet(string userId, int betId)
@@ -42,10 +44,50 @@ namespace PalBet.Services
             }
 
             betParticipant.Accepted = true;
+            if (!bet.Participants.Any(p => p.Accepted == false)) {
+                bet.state = BetState.InPlay;
+            }
             await _betRepository.SaveAsync();
 
 
-            //TODO: Check to see if the bet has been accepted by everyone.
+            
+            
+
+            return true;
+            
+
+        }
+
+        public async Task<bool> DeclineBet(string userId, int betId)
+        {
+            var bet = await _betRepository.GetByIdAsync(betId);
+
+            //keeping the checks seperate incase in future want to return the reason. Will have to explore this further.
+            if (bet == null)
+            {
+                //No Bet exists
+                return false;
+
+            }
+            var betParticipant = bet.Participants.FirstOrDefault(b => b.appUserId == userId);
+            if (betParticipant == null)
+            {
+                //There is no particpant with this id
+                return false;
+                //To do, return reason?
+            }
+            if (betParticipant.Accepted == true)
+            {
+                return false;
+                //Already accepted
+            }
+            if (bet.state != BetState.Requested)
+            {
+                return false;
+            }
+
+            bet.state = BetState.Rejected;
+            await _betRepository.SaveAsync();
 
             return true;
             
@@ -72,7 +114,11 @@ namespace PalBet.Services
             };
             
 
-
+            //Check to see if all participants have enough coins.
+            foreach (var p in betModel.Participants)
+            {
+                if ( await _userRepository.GetCoins(p.appUserId) < betModel.BetStake) { return null; }
+            }
 
 
             //To do: Validation
@@ -108,6 +154,7 @@ namespace PalBet.Services
             if (bet.state != BetState.InPlay) return false;
 
             //Check to see if the winner id exists in the bet
+            //This is mainly a double check but probably will be removed. 
             if (!bet.Participants.Any(p => p.appUserId == winnerUserId)) return false;
 
             //Otherwise update the bet
@@ -121,6 +168,32 @@ namespace PalBet.Services
             
 
 
+
+        }
+
+        public async Task<bool> DeleteBet(string userId, int betId)
+        {
+
+            //UNUSED
+            var bet = await _betRepository.GetByIdAsync(betId);
+            return false;
+        }
+
+        public async Task<bool> CancelBet(string userId, int betId)
+        {
+            var bet = await _betRepository.GetByIdAsync(betId);
+            if (bet == null) return false;
+                 
+            //Check to see if the person updating it is the person who should be.
+
+            if (!bet.Participants.FirstOrDefault(p => p.appUserId == userId).isBetHost) return false;
+            // Check to see if bet is in requeted state.
+            if (bet.state != BetState.Requested) return false;
+
+            bet.state = BetState.Cancelled;
+            await _betRepository.SaveAsync();
+
+            return true;
 
         }
     }

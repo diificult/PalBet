@@ -7,6 +7,7 @@ namespace PalBet.Models
     {
         public ICollection<BetParticipant> BetsParticipation { get; set; } = new List<BetParticipant>();
 
-        //public int PersonalCoins { get; set; } = 50;
+        //May be removed once groups added to have coins for a group.
+        public int PersonalCoins { get; set; } = 50;
     }
 }

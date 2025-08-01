@@ -3,12 +3,12 @@ using PalBet.Enums;
 using PalBet.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace PalBet.Dtos
+namespace PalBet.Dtos.Bet
 {
-    public class CreateBetDto 
+    public class CreateBetDto
     {
         [Required]
-        public List<string> ParticipantIds { get; set ; }
+        public List<string> ParticipantIds { get; set; }
         [Required]
         public string BetDescription { get; set; }
         public string UserWinner { get; set; } = string.Empty;

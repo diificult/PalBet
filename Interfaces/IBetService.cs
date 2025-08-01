@@ -13,8 +13,12 @@ namespace PalBet.Interfaces
         Task<List<Bet>?> GetRequestedBets(string userId);
         //Allows a user to accept a bet
         Task<bool> AcceptBet(string userId, int betId);
+        //User can decline bet
+        Task<bool> DeclineBet(string userId, int betId);
         //Choose winner
         Task<bool> SetWinner(string winnerUserId, string updaterUserId, int betId);
         Task<List<Bet>?> GetBetsByState(string userId, BetState? betState);
+        Task<bool> DeleteBet(string userId, int betId);
+        Task<bool> CancelBet(string userId, int betId);
     }
 }

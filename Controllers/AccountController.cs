@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PalBet.Dtos.Account;
+using PalBet.Extensions;
 using PalBet.Interfaces;
 using PalBet.Models;
 
@@ -13,12 +15,14 @@ namespace PalBet.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly ITokenService _tokenService;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly IAppUserService _appUserService;
 
-        public AccountController(UserManager<AppUser> uM, ITokenService tS, SignInManager<AppUser> siM)
+        public AccountController(UserManager<AppUser> uM, ITokenService tS, SignInManager<AppUser> siM, IAppUserService appUserService)
         {
             _userManager = uM;
             _tokenService = tS;
             _signInManager = siM;
+            _appUserService = appUserService;
         }
 
         [HttpPost("register")]
@@ -78,6 +82,16 @@ namespace PalBet.Controllers
                 Email = user.Email,
                 Token = _tokenService.CreateToken(user)
             });
+        }
+        [HttpGet("GetCoins")]
+        [Authorize]
+        public async Task<IActionResult> GetCoins()
+        {
+            var Username = User.GetUsername();
+            var appUser = await _userManager.FindByNameAsync(Username);
+            var coins = await _appUserService.GetCoins(appUser.Id);
+            if (coins == null) return BadRequest();
+            return Ok(coins);
         }
     }
 }

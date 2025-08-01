@@ -14,6 +14,7 @@ namespace PalBet.Interfaces
 
         Task<List<Bet>?> GetUsersBets(string userId);
 
+        Task<Bet?> DeleteAsync(int betId);
         Task SaveAsync();
     }
 }

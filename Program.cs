@@ -96,6 +96,9 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 builder.Services.AddScoped<IBetRepository, BetRepository>();
 builder.Services.AddScoped<IBetService, BetService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
+builder.Services.AddScoped<IAppUserService, AppUserService>();
+
 
 
 var app = builder.Build();

@@ -4,7 +4,9 @@
     {
         NotStarted,
         Requested,
+        Rejected,
         InPlay,
         Completed,
+        Cancelled,
     }
 }

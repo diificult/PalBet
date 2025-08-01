@@ -36,10 +36,10 @@ namespace PalBet.Controllers
             var bet = await _betService.CreateBet(dto, appUser.Id);
             if (bet != null)
                 return Created();
-            else return StatusCode(500, "Could not create");
+            else return StatusCode(500, "Could not create, most likely not enough coins from a user");
         }
 
-        [HttpGet]
+        [HttpGet("GetBetRequests")]
         [Authorize]
         public async Task<IActionResult> GetBetRequests()
         {
@@ -62,6 +62,18 @@ namespace PalBet.Controllers
             if (Accepted) return Ok();
             return NotFound();
 
+        }
+        [HttpPut("RejectBet")]
+        [Authorize]
+        public async Task<IActionResult> RejectBet(int betId)
+        {
+            var Username = User.GetUsername();
+            var AppUser = await _userManager.FindByNameAsync(Username);
+
+            var Rejected = await _betService.DeclineBet(AppUser.Id, betId);
+
+            if (Rejected) return Ok();
+            return NotFound();
         }
 
         [HttpPut("ChooseWinner")]
@@ -86,7 +98,19 @@ namespace PalBet.Controllers
             var AppUser = await _userManager.FindByNameAsync(Username);
 
             var bets = await _betService.GetBetsByState(AppUser.Id, state);
+            return Ok(bets);
         }
 
+        [HttpPut("CancelBet")]
+        [Authorize]
+        public async Task<IActionResult> CancelBet(int betId)
+        {
+            var Username = User.GetUsername();
+            var AppUser = await _userManager.FindByNameAsync(Username);
+
+            var bet = await _betService.CancelBet(AppUser.Id, betId);
+            return Ok(bet);
+        }
+    
     }
 }
