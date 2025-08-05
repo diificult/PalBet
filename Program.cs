@@ -19,6 +19,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.EnableSensitiveDataLogging(true);
 });
 
 builder.Services.AddSwaggerGen(option =>
@@ -98,6 +99,8 @@ builder.Services.AddScoped<IBetService, BetService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
 builder.Services.AddScoped<IAppUserService, AppUserService>();
+builder.Services.AddScoped<IFriendRepository, FriendRepository>();
+builder.Services.AddScoped<IFriendService, FriendService>();    
 
 
 

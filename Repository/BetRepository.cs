@@ -32,7 +32,10 @@ namespace PalBet.Repository
             return bet;
         }
 
-        
+        public Task<Bet?> DeleteAsync(int betId)
+        {
+            throw new NotImplementedException();
+        }
 
         public async Task<List<Bet>?> GetBetRequests(string userId)
         {
