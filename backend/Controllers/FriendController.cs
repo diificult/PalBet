@@ -21,7 +21,7 @@ namespace PalBet.Controllers
         //Send Request
         [HttpPost("SendRequest")]
         [Authorize]
-        public async Task<IActionResult> SendRequest(string Username)
+        public async Task<IActionResult> SendRequest([FromBody]string Username)
         {
 
             var RequesterUsername = User.GetUsername();
@@ -45,7 +45,7 @@ namespace PalBet.Controllers
 
         [HttpPut]
         [Authorize]
-        public async Task<IActionResult> AcceptRequest(string Username)
+        public async Task<IActionResult> AcceptRequest([FromBody]string Username)
         {
             var AccepteeUsername = User.GetUsername();
             var AccepteeId = await _userManager.FindByNameAsync(AccepteeUsername);

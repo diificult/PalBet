@@ -6,6 +6,7 @@ import AuthenticationPage, {
     action as authAction,
 } from "./pages/Authentication";
 import { tokenLoader } from "./util/auth";
+import { action as addFriendAction } from "./components/AddFriend";
 
 const router = createBrowserRouter([
     {
@@ -18,6 +19,7 @@ const router = createBrowserRouter([
                 path: "friends",
                 element: <FriendsPage />,
                 loader: friendsLoader,
+                action: addFriendAction,
             },
             {
                 path: "auth",
