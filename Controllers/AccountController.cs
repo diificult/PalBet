@@ -63,12 +63,13 @@ namespace PalBet.Controllers
             }
         }
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDto dto)
+        public async Task<IActionResult> Login([FromBody]LoginDto dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+            Console.WriteLine($"Username: {dto.Username}, Password: {dto.Password}");
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == dto.Username.ToLower());
             if (user == null) return Unauthorized("Invalid Username");
 

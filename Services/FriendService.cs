@@ -1,4 +1,6 @@
-﻿using PalBet.Interfaces;
+﻿using PalBet.Dtos.Friends;
+using PalBet.Interfaces;
+using PalBet.Mappers;
 using PalBet.Models;
 
 namespace PalBet.Services
@@ -48,9 +50,23 @@ namespace PalBet.Services
             return await _friendRepository.CreateFriendship(newFriendship);
         }
 
-        public async Task<List<Friendship>?> GetFriendsList(string userId)
+        public async Task<List<FriendDto>?> GetFriendsList(string userId)
         {
-            return await _friendRepository.GetFriendships(userId);
+            var friendships = await _friendRepository.GetFriendships(userId);
+            List<FriendDto> friends = new List<FriendDto>();
+
+           foreach (Friendship f in friendships)
+            {
+                if (f.RequesterId == userId)
+                {
+                    friends.Add(f.Requestee.fromFreindshipToFriendDto());
+                } else
+                {
+                    friends.Add(f.Requester.fromFreindshipToFriendDto());
+                }
+            }
+            return friends;
+
         }
 
         

@@ -75,6 +75,7 @@ namespace PalBet.Controllers
             var Username = User.GetUsername();
             var AppUser = await _userManager.FindByNameAsync(Username);
             var List = await _friendService.GetFriendsList(AppUser.Id);
+            return Ok(List);
         }
         
 

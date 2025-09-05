@@ -37,7 +37,7 @@ namespace PalBet.Repository
         //Get accepted friendships
         public async Task<List<Friendship>?> GetFriendships(string UserId)
         {
-            var friends = await _context.friendships.Where(f => (f.RequesterId == UserId || f.RequesteeId == UserId) && f.state == Enums.FriendshipState.Friends).ToListAsync();
+            var friends = await _context.friendships.Where(f => (f.RequesterId == UserId || f.RequesteeId == UserId) && f.state == Enums.FriendshipState.Friends).Include(ee => ee.Requestee).Include(er => er.Requester).ToListAsync();
             return friends;
         }
 
