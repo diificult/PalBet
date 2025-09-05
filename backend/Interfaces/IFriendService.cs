@@ -10,6 +10,8 @@ namespace PalBet.Interfaces
         
         public Task<Friendship?> AcceptRequest(string requesterId, string AccepteeId);
         public Task<List<FriendDto>?> GetFriendsList(string userId);
+        public Task<List<FriendDto>?> GetFriendRequests(string userId);
+        public Task<List<FriendDto>?> GetFriendRequested(string userId);
 
     }
 }

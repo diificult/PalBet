@@ -8,7 +8,7 @@ import { Await, useLoaderData } from "react-router-dom";
 const requestConfig = {};
 
 export default function Friends() {
-    const { friends } = useLoaderData();
+    const { friends, friendRequests, friendRequested } = useLoaderData();
     return (
         <>
             <Container>
@@ -17,13 +17,44 @@ export default function Friends() {
                 >
                     <Await resolve={friends}>
                         {(loadedFriends) => (
-                            <FriendsList friends={loadedFriends} />
+                            <FriendsList
+                                friends={loadedFriends}
+                                mode="friend"
+                            />
                         )}
                     </Await>
                 </Suspense>
             </Container>
             <Container>
                 <AddFriend> </AddFriend>
+            </Container>
+            <Container>
+                <Suspense
+                    fallback={<p style={{ textAlign: "center" }}>Loading...</p>}
+                >
+                    <Await resolve={friendRequests}>
+                        {(loadedRequests) => (
+                            <FriendsList
+                                friends={loadedRequests}
+                                mode="request"
+                            />
+                        )}
+                    </Await>
+                </Suspense>
+            </Container>
+            <Container>
+                <Suspense
+                    fallback={<p style={{ textAlign: "center" }}>Loading...</p>}
+                >
+                    <Await resolve={friendRequested}>
+                        {(loadedRequests) => (
+                            <FriendsList
+                                friends={loadedRequests}
+                                mode="requested"
+                            />
+                        )}
+                    </Await>
+                </Suspense>
             </Container>
         </>
     );
@@ -49,9 +80,50 @@ async function loadFriends() {
     const resData = await response.json();
     return resData;
 }
+async function loadFriendRequests() {
+    const response = await sendHttpRequest("/GetFriendRequests", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + getAuthToken(),
+        },
+    });
+    if (!response.ok) {
+        throw new Response(
+            JSON.stringify({ message: "Could not get friend request list" }),
+            {
+                status: 422,
+            }
+        );
+    }
 
+    const resData = await response.json();
+    return resData;
+}
+async function loadFriendRequested() {
+    const response = await sendHttpRequest("/GetFriendRequested", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + getAuthToken(),
+        },
+    });
+    if (!response.ok) {
+        throw new Response(
+            JSON.stringify({ message: "Could not get requested friends list" }),
+            {
+                status: 422,
+            }
+        );
+    }
+
+    const resData = await response.json();
+    return resData;
+}
 export async function loader() {
     return {
         friends: loadFriends(),
+        friendRequests: loadFriendRequests(),
+        friendRequested: loadFriendRequested(),
     };
 }

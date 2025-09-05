@@ -42,12 +42,25 @@ namespace PalBet.Services
             //Creates new friendship
             Friendship newFriendship = new Friendship{
                 RequesterId = requesterId,
-                RequesteeId = requesteeId,
+                RequesteeId = requesteeId,  
             };
 
             Console.WriteLine("Now adding");
 
             return await _friendRepository.CreateFriendship(newFriendship);
+        }
+
+        public  async Task<List<FriendDto>?> GetFriendRequested(string userId)
+        {
+            var freiendRequests = await _friendRepository.GetFriendshipRequested(userId);
+            return freiendRequests?.Select(f => new FriendDto { UserId = f.RequesteeId, Username = f.Requestee.UserName }).ToList();
+        }
+
+        public async Task<List<FriendDto>?> GetFriendRequests(string userId)
+        {
+
+            var freiendRequests = await _friendRepository.GetFriendshipRequests(userId);
+            return freiendRequests?.Select(f => new FriendDto { UserId = f.RequesterId, Username = f.Requester.UserName }).ToList();
         }
 
         public async Task<List<FriendDto>?> GetFriendsList(string userId)
@@ -68,6 +81,8 @@ namespace PalBet.Services
             return friends;
 
         }
+
+        
 
         
     }

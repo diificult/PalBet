@@ -77,9 +77,27 @@ namespace PalBet.Controllers
             var List = await _friendService.GetFriendsList(AppUser.Id);
             return Ok(List);
         }
-        
+
 
         //Get all friend requests
+        [HttpGet("GetFriendRequests")]
+        [Authorize]
+        public async Task<IActionResult> GetFriendRequests()
+        {
+            var Username = User.GetUsername();
+            var AppUser = await _userManager.FindByNameAsync(Username);
+            var List = await _friendService.GetFriendRequests(AppUser.Id);
+            return Ok(List);
+        }
+        [HttpGet("GetFriendRequested")]
+        [Authorize]
+        public async Task<IActionResult> GetFriendRequested()
+        {
+            var Username = User.GetUsername();
+            var AppUser = await _userManager.FindByNameAsync(Username);
+            var List = await _friendService.GetFriendRequested(AppUser.Id);
+            return Ok(List);
+        }
 
 
 

@@ -24,13 +24,13 @@ namespace PalBet.Repository
 
         public async Task<List<Friendship>?> GetFriendshipRequested(string requesterId)
         {
-            var requests = await _context.friendships.Where(f => f.RequesterId == requesterId && f.state == Enums.FriendshipState.Requested).ToListAsync();
+            var requests = await _context.friendships.Where(f => f.RequesterId == requesterId && f.state == Enums.FriendshipState.Requested).Include(ee => ee.Requestee).ToListAsync();
             return requests;
         }
 
         public async Task<List<Friendship>?> GetFriendshipRequests(string UserId)
         {
-            var requests = await _context.friendships.Where(f => f.RequesteeId == UserId && f.state == Enums.FriendshipState.Requested).ToListAsync();
+            var requests = await _context.friendships.Where(f => f.RequesteeId == UserId && f.state == Enums.FriendshipState.Requested).Include(er => er.Requester).ToListAsync();
             return requests;
         }
 
