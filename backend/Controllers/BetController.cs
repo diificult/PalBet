@@ -11,7 +11,7 @@ using PalBet.Enums;
 
 namespace PalBet.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class BetController : ControllerBase
     {
@@ -25,15 +25,14 @@ namespace PalBet.Controllers
             _userManager = um;
         }
         
-        [HttpPost]
+        [HttpPost("CreateBet")]
         [Authorize]
         public async Task<IActionResult> CreateNewBet([FromBody] CreateBetDto dto)
         {
-            //Todo put these two lines into a seperate bit
+
             var Username = User.GetUsername();
-            var appUser = await _userManager.FindByNameAsync(Username);
-            dto.ParticipantIds.Add(appUser.Id);
-            var bet = await _betService.CreateBet(dto, appUser.Id);
+            dto.ParticipantUsernames.Add(Username);
+            var bet = await _betService.CreateBet(dto, Username);
             if (bet != null)
                 return Created();
             else return StatusCode(500, "Could not create, most likely not enough coins from a user");
@@ -42,7 +41,7 @@ namespace PalBet.Controllers
         [HttpGet("GetBetRequests")]
         [Authorize]
         public async Task<IActionResult> GetBetRequests()
-        {
+        {            //Todo put these two lines into a seperate bit
             var Username = User.GetUsername();
             var appUser = await _userManager.FindByNameAsync(Username);
             var bets = await _betService.GetBetRequests(appUser.Id);

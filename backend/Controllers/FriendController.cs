@@ -7,6 +7,8 @@ using PalBet.Models;
 
 namespace PalBet.Controllers
 {
+    [Route("[controller]")]
+    [ApiController]
     public class FriendController : ControllerBase
     {
 
@@ -43,7 +45,7 @@ namespace PalBet.Controllers
 
         //Accept Request
 
-        [HttpPut]
+        [HttpPut("AcceptFriendRequest")]
         [Authorize]
         public async Task<IActionResult> AcceptRequest([FromBody]string Username)
         {
@@ -51,17 +53,45 @@ namespace PalBet.Controllers
             var AccepteeId = await _userManager.FindByNameAsync(AccepteeUsername);
             var RequesterId = await _userManager.FindByNameAsync(Username);
 
-            if (RequesterId == null) return NotFound();
+            if (RequesterId == null) return BadRequest("Could not find user");
 
             var acceptRequest = await _friendService.AcceptRequest(RequesterId.Id, AccepteeId.Id);
-            if (acceptRequest == null) return NotFound();
-            return Ok(acceptRequest);
+            if (acceptRequest == false) return BadRequest("Could not accept");
+            return Ok();
         }
 
 
         //Cancel Request
 
+        [HttpDelete("CancelFriendRequest")]
+        [Authorize]
+        public async Task<IActionResult> CancelFriendRequest([FromBody] string Username)
+        {
+            var RequesterUsername = User.GetUsername();
+            var Requester = await _userManager.FindByNameAsync(RequesterUsername);
+            var Requestee = await _userManager.FindByNameAsync(Username);
+            if (Requestee == null) return BadRequest("Could not find user");
 
+            var deletedRequest = await _friendService.CancelRequest(Requester.Id, Requestee.Id);
+            if (deletedRequest == false) return BadRequest("Could not cancel request");
+            return Ok();
+        }
+
+        //Decline Request
+
+        [HttpDelete("DeclineFriendRequest")]
+        [Authorize]
+        public async Task<IActionResult> DeclineFriendRequest([FromBody] string Username)
+        {
+            var RequesterUsername = User.GetUsername();
+            var Requestee = await _userManager.FindByNameAsync(RequesterUsername);
+            var Requester = await _userManager.FindByNameAsync(Username);
+            if (Requester == null) return BadRequest("Could not find user");
+
+            var deletedRequest = await _friendService.CancelRequest(Requester.Id, Requestee.Id);
+            if (deletedRequest == false) return BadRequest("Could not decline request");
+            return Ok();
+        }
 
         //Delete Friend
 

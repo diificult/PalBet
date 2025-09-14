@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using PalBet.Dtos.Bet;
 using PalBet.Enums;
 using PalBet.Interfaces;
@@ -12,11 +13,13 @@ namespace PalBet.Services
 
         public readonly IBetRepository _betRepository;
         public readonly IAppUserRepository _userRepository;
+        public readonly UserManager<AppUser> _userManager;
 
-        public BetService(IBetRepository betRepository, IAppUserRepository appUserRepository)
+        public BetService(IBetRepository betRepository, IAppUserRepository appUserRepository, UserManager<AppUser> userManager)
         {
             _betRepository = betRepository;
             _userRepository = appUserRepository;
+            _userManager = userManager;
         }
 
         public async Task<bool> AcceptBet(string userId, int betId)
@@ -96,22 +99,28 @@ namespace PalBet.Services
 
         public async Task<Bet> CreateBet(CreateBetDto betDto, string betHost)
         {
+            var participants = new List<BetParticipant>();
 
-            Bet betModel = new Bet
+            foreach (var username in betDto.ParticipantUsernames)
             {
-                Participants = betDto.ParticipantIds.Select(userId => new BetParticipant
-                {
-                    appUserId = userId,
-                    isBetHost = userId == betHost,
-                    Accepted = userId == betHost,
-                }).ToList(),
+                var user = await _userManager.FindByNameAsync(username);
 
-                state = betDto.state,
+                participants.Add(new BetParticipant
+                {
+                    appUserId = user.Id,
+                    isBetHost = username == betHost,
+                    Accepted = username == betHost,
+                });
+            }
+            Bet betModel = new Bet
+            {            
+                Participants = participants,
+                state = BetState.Requested,
                 BetStake = betDto.BetStake,
-                UserWinner = betDto.UserWinner,
+                UserWinner = null,
                 BetDescription = betDto.BetDescription,
 
-            };
+            }; 
             
 
             //Check to see if all participants have enough coins.

@@ -4,7 +4,7 @@ import AddFriend from "../components/AddFriend";
 import { Suspense } from "react";
 import { sendHttpRequest } from "../hooks/useHttp";
 import { getAuthToken } from "../util/auth";
-import { Await, useLoaderData } from "react-router-dom";
+import { Await, redirect, useLoaderData } from "react-router-dom";
 const requestConfig = {};
 
 export default function Friends() {
@@ -61,7 +61,7 @@ export default function Friends() {
 }
 
 async function loadFriends() {
-    const response = await sendHttpRequest("/GetFriendsList", {
+    const response = await sendHttpRequest("Friends/GetFriendsList", {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -81,7 +81,7 @@ async function loadFriends() {
     return resData;
 }
 async function loadFriendRequests() {
-    const response = await sendHttpRequest("/GetFriendRequests", {
+    const response = await sendHttpRequest("/Friends/GetFriendRequests", {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -101,7 +101,7 @@ async function loadFriendRequests() {
     return resData;
 }
 async function loadFriendRequested() {
-    const response = await sendHttpRequest("/GetFriendRequested", {
+    const response = await sendHttpRequest("/Friends/GetFriendRequested", {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -126,4 +126,32 @@ export async function loader() {
         friendRequests: loadFriendRequests(),
         friendRequested: loadFriendRequested(),
     };
+}
+export async function action({ request }) {
+    const formData = await request.formData();
+    const actionType = formData.get("action");
+    const friendUsername = formData.get("friendUsername");
+    let endpoint = "";
+    if (actionType === "add") endpoint = "/Friend/SendRequest";
+    if (actionType === "accept") endpoint = "/Friend/AcceptFriendRequest";
+    if (actionType === "decline") endpoint = "/Friend/DeclineFriendRequest";
+    if (actionType === "cancel") endpoint = "/Friend/CancelFriendRequest";
+
+    const response = await sendHttpRequest(endpoint, {
+        method: request.method,
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + getAuthToken(),
+        },
+        body: JSON.stringify(friendUsername),
+    });
+    if (!response.ok) {
+        throw new Response(
+            JSON.stringify({ message: "Could not modify friend status" }),
+            {
+                status: 422,
+            }
+        );
+    }
+    return redirect("/friends");
 }

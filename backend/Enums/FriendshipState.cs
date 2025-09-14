@@ -4,6 +4,6 @@
     {
         Requested,
         Friends,
-        Blocked
+        Blocked,
     }
 }

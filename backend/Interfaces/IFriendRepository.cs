@@ -8,6 +8,7 @@ namespace PalBet.Interfaces
         public Task<List<Friendship>?> GetFriendshipRequested(string requesterId);
         public Task<List<Friendship>?> GetFriendshipRequests(string UserId);
         public Task<List<Friendship>?> GetFriendships(string UserId);
+        public Task<Friendship?> DeleteAsync(string requesterId, string requesteeId);
         public Task SaveAync();
     }
 }

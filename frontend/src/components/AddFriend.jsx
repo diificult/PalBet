@@ -27,9 +27,10 @@ export default function AddFriend() {
         <div className=" items-center p-24">
             <h1>Add Friend</h1>
             <fetcher.Form method="post" className="flex justify-center p-6">
+                <input type="hidden" name="action" value="add" />
                 <TextField
-                    id="addFriend"
-                    name="addFriend"
+                    id="friendUsername"
+                    name="friendUsername"
                     label="Add Friend"
                     variant="outlined"
                     type="text"
@@ -45,20 +46,4 @@ export default function AddFriend() {
             </fetcher.Form>
         </div>
     );
-}
-
-export async function action({ request, params }) {
-    const data = await request.formData();
-    const response = await sendHttpRequest("/SendRequest", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + getAuthToken(),
-        },
-        body: JSON.stringify(data.get("addFriend")),
-    });
-    if (!response.ok) {
-        return { message: "Could not add friend." };
-    }
-    return { message: "Request sent!" };
 }

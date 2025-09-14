@@ -8,12 +8,9 @@ namespace PalBet.Dtos.Bet
     public class CreateBetDto
     {
         [Required]
-        public List<string> ParticipantIds { get; set; }
+        public List<string> ParticipantUsernames { get; set; }
         [Required]
         public string BetDescription { get; set; }
-        public string UserWinner { get; set; } = string.Empty;
-        [Required]
-        public BetState state { get; set; }
         public int BetStake { get; set; }
     }
 }

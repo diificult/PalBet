@@ -17,7 +17,6 @@ namespace PalBet.Mappers
                  //   AppUserId = userId
               //  }).ToList()
                 BetDescription = dto.BetDescription,
-                UserWinner = dto.UserWinner,
 
             };
         }

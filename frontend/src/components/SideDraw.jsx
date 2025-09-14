@@ -16,8 +16,6 @@ import { NavLink, useRouteLoaderData } from "react-router-dom";
 
 const drawerWidth = 240;
 
-//TODO: Set side panel based on if logged in
-
 export default function SideDraw() {
     const token = useRouteLoaderData("root");
     return (
@@ -46,7 +44,7 @@ export default function SideDraw() {
                         </ListItemButton>
                     </ListItem>
                     <ListItem key="Bets" disablePadding>
-                        <ListItemButton>
+                        <ListItemButton component={NavLink} to="/bets">
                             <ListItemIcon>
                                 <MoneyIcon></MoneyIcon>
                             </ListItemIcon>

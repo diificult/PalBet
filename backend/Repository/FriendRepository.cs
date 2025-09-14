@@ -22,6 +22,18 @@ namespace PalBet.Repository
             return friendship;
         }
 
+        public async Task<Friendship?> DeleteAsync(string requesterId, string requesteeId)
+        {
+            var friendship = await _context.friendships.FirstOrDefaultAsync(f => f.RequesterId == requesterId && f.RequesteeId == requesteeId);
+            if (friendship == null)
+            {
+                return null;
+            }
+            _context.friendships.Remove(friendship);
+            await _context.SaveChangesAsync();
+            return friendship;
+        }
+
         public async Task<List<Friendship>?> GetFriendshipRequested(string requesterId)
         {
             var requests = await _context.friendships.Where(f => f.RequesterId == requesterId && f.state == Enums.FriendshipState.Requested).Include(ee => ee.Requestee).ToListAsync();
@@ -43,7 +55,7 @@ namespace PalBet.Repository
 
         public async Task SaveAync()
         {
-            throw new NotImplementedException();
+            await _context.SaveChangesAsync();
         }
     }
 }

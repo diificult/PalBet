@@ -1,3 +1,5 @@
+import { redirect } from "react-router-dom";
+import { sendHttpRequest } from "../hooks/useHttp";
 import FriendItem from "./FriendItem";
 const requestConfig = {};
 export default function FriendsList({ friends, mode }) {

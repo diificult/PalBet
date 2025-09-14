@@ -7,7 +7,7 @@ namespace PalBet.Models
         public int Id { get; set; }
         public ICollection<BetParticipant> Participants { get; set; } = new List<BetParticipant>();
         public string BetDescription { get; set; }
-        public string UserWinner { get; set; } = string.Empty;
+        public string? UserWinner { get; set; } = string.Empty;
         public BetState state { get; set; }
         public int BetStake { get; set; }
 

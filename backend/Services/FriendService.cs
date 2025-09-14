@@ -14,19 +14,27 @@ namespace PalBet.Services
             _friendRepository = friendRepository;
         }
 
-        public async Task<Friendship?> AcceptRequest(string requesterId, string AccepteeId)
+        public async Task<bool> AcceptRequest(string requesterId, string AccepteeId)
         {
-            var requesterFriendships = await _friendRepository.GetFriendshipRequests(requesterId);
+            var requesterFriendships = await _friendRepository.GetFriendshipRequested(requesterId);
             var request = requesterFriendships.FirstOrDefault(f => f.RequesteeId == AccepteeId);
-            if (request == null) return null;
+            if (request == null) return false;
 
             request.state = Enums.FriendshipState.Friends;
             request.FriendshipTime = DateTime.Now;
 
             await  _friendRepository.SaveAync();
 
-            return request;
+            return true;
 
+
+        }
+
+        public  async Task<bool> CancelRequest(string requesterId, string requesteeId)
+        {
+            var friendship = await _friendRepository.DeleteAsync(requesterId, requesteeId);
+            if (friendship == null) return false;
+            else return true;
 
         }
 
@@ -44,7 +52,7 @@ namespace PalBet.Services
                 RequesterId = requesterId,
                 RequesteeId = requesteeId,  
             };
-
+    
             Console.WriteLine("Now adding");
 
             return await _friendRepository.CreateFriendship(newFriendship);
