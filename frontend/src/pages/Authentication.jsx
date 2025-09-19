@@ -1,6 +1,7 @@
 import { redirect } from "react-router-dom";
 import AuthForm from "../components/AuthForm";
 import useHttp, { sendHttpRequest } from "../hooks/useHttp";
+import { getAuthToken } from "../util/auth";
 
 export default function AuthenticationPage() {
     return <AuthForm />;
@@ -20,7 +21,6 @@ export async function action({ request }) {
         Username: data.get("username"),
         Password: data.get("password"),
     };
-    console.log(authData);
     if (mode === "register") {
         authData.email = data.get("email");
     }
@@ -32,7 +32,6 @@ export async function action({ request }) {
         },
         body: JSON.stringify(authData),
     });
-    console.log(response);
     if (!response.ok) {
         throw new Response(JSON.stringify({ message: "Could not auth" }), {
             status: 422,
@@ -46,6 +45,18 @@ export async function action({ request }) {
     expiration.setHours(expiration.getHours() + 24);
     localStorage.setItem("expiration", expiration.toISOString());
 
-    console.log("token is " + token);
+    const usernameResponse = await sendHttpRequest("/GetUsername", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + getAuthToken(),
+        },
+    });
+
+    const username = await usernameResponse.text();
+    console.log(username);
+
+    localStorage.setItem("username", username);
+    console.log("token is " + token + " username is " + username);
     return redirect("/");
 }

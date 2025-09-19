@@ -2,7 +2,6 @@ import Drawer from "@mui/material/Drawer";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
-import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -12,12 +11,24 @@ import GroupIcon from "@mui/icons-material/Group";
 import MoneyIcon from "@mui/icons-material/Money";
 import GroupsIcon from "@mui/icons-material/Groups";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { NavLink, useRouteLoaderData } from "react-router-dom";
+import {
+    Await,
+    Form,
+    NavLink,
+    useLoaderData,
+    useRouteLoaderData,
+} from "react-router-dom";
 
-const drawerWidth = 240;
+import defaultimg from "../assets/default.jpg";
+import { sendHttpRequest } from "../hooks/useHttp";
+import { Suspense } from "react";
+import { getAuthToken } from "../util/auth";
+const drawerWidth = 340;
 
 export default function SideDraw() {
-    const token = useRouteLoaderData("root");
+    const { token, sideData, username } = useRouteLoaderData("root");
+    // const { coins } = useLoaderData();
+
     return (
         <>
             <Drawer
@@ -32,7 +43,39 @@ export default function SideDraw() {
                 variant="permanent"
                 anchor="left"
             >
-                <Toolbar />
+                {token && (
+                    <div className=" p-3 flex">
+                        <div className="p-2">
+                            <img
+                                src={defaultimg}
+                                className="rounded-md max-w-16"
+                            />
+                        </div>
+                        <div>
+                            <p className="font-bold text-3xl">{username}</p>
+                            <Suspense fallback={<p>Loading...</p>}>
+                                <Await resolve={sideData}>
+                                    {(loadedCoins) => (
+                                        <p>{loadedCoins} coins</p>
+                                    )}
+                                </Await>
+                            </Suspense>
+                        </div>
+                    </div>
+                )}
+                <Divider />
+                <List>
+                    <ListItem disablePadding>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <p className="bg-gray-500 rounded-full px-5 text-white">
+                                    0
+                                </p>
+                            </ListItemIcon>
+                            <ListItemText primary="Notification" />
+                        </ListItemButton>
+                    </ListItem>
+                </List>
                 <Divider />
                 <List>
                     <ListItem disablePadding>
@@ -90,12 +133,14 @@ export default function SideDraw() {
                     )}
                     {token && (
                         <ListItem key="Signout" disablePadding>
-                            <ListItemButton>
-                                <ListItemIcon>
-                                    <LogoutIcon></LogoutIcon>
-                                </ListItemIcon>
-                                <ListItemText primary="Sign Out" />
-                            </ListItemButton>
+                            <Form method="post" action="/logout">
+                                <ListItemButton type="submit">
+                                    <ListItemIcon>
+                                        <LogoutIcon></LogoutIcon>
+                                    </ListItemIcon>
+                                    <ListItemText primary="Sign Out" />
+                                </ListItemButton>
+                            </Form>
                         </ListItem>
                     )}
                 </List>
@@ -103,4 +148,20 @@ export default function SideDraw() {
             <Toolbar />
         </>
     );
+}
+
+export async function loader() {
+    return getCoins();
+}
+
+async function getCoins() {
+    const response = await sendHttpRequest("/GetCoins", {
+        method: "Get",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + getAuthToken(),
+        },
+    });
+    const resData = await response.json();
+    return resData;
 }

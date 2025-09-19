@@ -94,5 +94,12 @@ namespace PalBet.Controllers
             if (coins == null) return BadRequest();
             return Ok(coins);
         }
+        [HttpGet("GetUsername")]
+        [Authorize]
+        public IActionResult GetUsername()
+        {
+            var Username = User.GetUsername();
+            return Ok(Username);
+        }
     }
 }

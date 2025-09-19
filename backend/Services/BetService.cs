@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PalBet.Dtos.Bet;
 using PalBet.Enums;
 using PalBet.Interfaces;
+using PalBet.Mappers;
 using PalBet.Models;
 using System.Data.SqlTypes;
 
@@ -49,6 +50,8 @@ namespace PalBet.Services
             betParticipant.Accepted = true;
             if (!bet.Participants.Any(p => p.Accepted == false)) {
                 bet.state = BetState.InPlay;
+                //Remove coins for each player
+                
             }
             await _betRepository.SaveAsync();
 
@@ -139,11 +142,12 @@ namespace PalBet.Services
             return await _betRepository.GetBetRequests(userId);
         }
 
-        public async Task<List<Bet>?> GetBetsByState(string userId, BetState? betState)
+        public async Task<List<BetDto>?> GetBetsByState(string userId, BetState? betState)
         {
             var bets = await _betRepository.GetUsersBets(userId);
             if (betState == null) return null;
-            return bets.Where(b => b.state == betState).ToList();
+
+            return bets.Where(b => b.state == betState).ToList().Select(bet => bet.toBetDtoFromBets(userId)).ToList();
         }
 
         public Task<List<Bet>?> GetRequestedBets(string userId)
@@ -163,7 +167,6 @@ namespace PalBet.Services
             if (bet.state != BetState.InPlay) return false;
 
             //Check to see if the winner id exists in the bet
-            //This is mainly a double check but probably will be removed. 
             if (!bet.Participants.Any(p => p.appUserId == winnerUserId)) return false;
 
             //Otherwise update the bet

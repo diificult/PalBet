@@ -8,21 +8,41 @@ import FriendsPage, {
 import AuthenticationPage, {
     action as authAction,
 } from "./pages/Authentication";
-import { tokenLoader } from "./util/auth";
+import { tokenLoader, usernameLoader } from "./util/auth";
 
-import { action as logoutAction } from "./pages/Logout";
-import BetsPage, { loader as betsLoader } from "./pages/Bets";
+import { action as logoutAction } from "./pages/Logout.jsx";
+import BetsPage, {
+    loader as betsLoader,
+    action as betsAction,
+} from "./pages/Bets";
 import NewBetPage from "./pages/NewBet";
 import {
     loader as newBetLoader,
     action as newBetAction,
 } from "./components/CreateBetRequestForm";
+import { loader as SideDrawLoader } from "./components/SideDraw";
+
+async function rootLoader() {
+    const token = await tokenLoader();
+
+    const promises = [];
+
+    let username = null;
+    if (token) {
+        username = await usernameLoader();
+        promises.push(SideDrawLoader());
+    }
+
+    const [sideData] = await Promise.all(promises);
+
+    return { token, sideData: sideData ?? null, username };
+}
 
 const router = createBrowserRouter([
     {
         path: "/",
         element: <RootLayout />,
-        loader: tokenLoader,
+        loader: rootLoader,
         id: "root",
         children: [
             {
@@ -34,8 +54,14 @@ const router = createBrowserRouter([
             },
             {
                 path: "bets",
+                id: "bets",
                 children: [
-                    { index: true, element: <BetsPage />, loader: betsLoader },
+                    {
+                        index: true,
+                        element: <BetsPage />,
+                        loader: betsLoader,
+                        action: betsAction,
+                    },
                     {
                         path: "new",
                         element: <NewBetPage />,

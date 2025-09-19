@@ -60,7 +60,6 @@ export default function CreateBetRequestForm({ method }) {
                         min={formattedNow}
                     ></Input>
                 </div>
-                {/* Hidden input so FormData picks up the state */}
                 <input
                     type="hidden"
                     name="friends"

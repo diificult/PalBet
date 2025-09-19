@@ -29,6 +29,17 @@ export function tokenLoader() {
     return token;
 }
 
+export function getUsername() {
+    const username = localStorage.getItem("username");
+
+    if (!username) return null;
+    return username;
+}
+
+export function usernameLoader() {
+    return getUsername();
+}
+
 export function checkAuth() {
     const token = getAuthToken();
 

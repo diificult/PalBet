@@ -2,9 +2,11 @@ import { Outlet, useLoaderData, useSubmit } from "react-router-dom";
 import SideDraw from "../components/SideDraw";
 import { useEffect } from "react";
 import { getTokenDuration } from "../util/auth";
+import { ChooseWinnerContextProvider } from "../store/ChooseWinnerContext";
+import ChooseWinner from "../components/ChooseWinner";
 
 function RootLayout() {
-    const token = useLoaderData();
+    const { token } = useLoaderData();
     const submit = useSubmit();
     useEffect(() => {
         if (!token) {
@@ -24,10 +26,12 @@ function RootLayout() {
 
     return (
         <>
-            <SideDraw />
-            <main>
-                <Outlet />
-            </main>
+            <ChooseWinnerContextProvider>
+                <SideDraw />
+                <main>
+                    <Outlet />
+                </main>
+            </ChooseWinnerContextProvider>
         </>
     );
 }

@@ -51,7 +51,7 @@ namespace PalBet.Controllers
 
         [HttpPut("AcceptBet")]
         [Authorize]
-        public async Task<IActionResult> AcceptBet(int betId)
+        public async Task<IActionResult> AcceptBet([FromBody]int betId)
         {
             var Username = User.GetUsername();
             var AppUser = await _userManager.FindByNameAsync(Username);
@@ -64,7 +64,7 @@ namespace PalBet.Controllers
         }
         [HttpPut("RejectBet")]
         [Authorize]
-        public async Task<IActionResult> RejectBet(int betId)
+        public async Task<IActionResult> RejectBet([FromBody] int betId)
         {
             var Username = User.GetUsername();
             var AppUser = await _userManager.FindByNameAsync(Username);
@@ -78,12 +78,13 @@ namespace PalBet.Controllers
         [HttpPut("ChooseWinner")]
         [Authorize]
 
-        public async Task<IActionResult> ChooseWinner(int betId, string userId)
+        public async Task<IActionResult> ChooseWinner([FromBody] ChooseWinnerDto dto)
         {
             var Username = User.GetUsername();
             var AppUser = await _userManager.FindByNameAsync(Username);
+            var winnerUserId = await _userManager.FindByNameAsync(dto.winnerUsername);
 
-            var winner = await _betService.SetWinner(userId, AppUser.Id, betId);
+            var winner = await _betService.SetWinner(winnerUserId.Id, AppUser.Id, dto.betId);
 
             if (winner) return Ok();
             return BadRequest();
@@ -102,7 +103,7 @@ namespace PalBet.Controllers
 
         [HttpPut("CancelBet")]
         [Authorize]
-        public async Task<IActionResult> CancelBet(int betId)
+        public async Task<IActionResult> CancelBet([FromBody] int betId)
         {
             var Username = User.GetUsername();
             var AppUser = await _userManager.FindByNameAsync(Username);

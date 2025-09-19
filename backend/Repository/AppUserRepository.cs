@@ -18,5 +18,13 @@ namespace PalBet.Repository
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
             return user.PersonalCoins;
         }
+
+        public async Task<int> UpdateCoins(string id, int value)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            user.PersonalCoins += value;
+            await _context.SaveChangesAsync();
+            return user.PersonalCoins;
+        }
     }
 }
