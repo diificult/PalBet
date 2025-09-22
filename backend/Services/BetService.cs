@@ -49,9 +49,19 @@ namespace PalBet.Services
 
             betParticipant.Accepted = true;
             if (!bet.Participants.Any(p => p.Accepted == false)) {
-                bet.state = BetState.InPlay;
                 //Remove coins for each player
-                
+                foreach(BetParticipant p in bet.Participants)
+                {
+                    var user = await _userRepository.GetUserAsync(p.appUserId);
+                    var updatedCoins = user.PersonalCoins - bet.BetStake;
+                    if (updatedCoins < 0)
+                    {
+                        return false;
+                    }
+                }
+                await _betRepository.SaveAsync();
+                bet.state = BetState.InPlay;
+
             }
             await _betRepository.SaveAsync();
 
@@ -94,6 +104,7 @@ namespace PalBet.Services
 
             bet.state = BetState.Rejected;
             await _betRepository.SaveAsync();
+
 
             return true;
             
@@ -171,6 +182,7 @@ namespace PalBet.Services
 
             //Otherwise update the bet
 
+           await _userRepository.UpdateCoins(winnerUserId, betId);
             bet.UserWinner = winnerUserId;
             bet.state = BetState.Completed;
 

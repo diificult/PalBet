@@ -8,7 +8,7 @@ import FriendsPage, {
 import AuthenticationPage, {
     action as authAction,
 } from "./pages/Authentication";
-import { tokenLoader, usernameLoader } from "./util/auth";
+import { tokenLoader, usernameLoader, checkAuth } from "./util/auth";
 
 import { action as logoutAction } from "./pages/Logout.jsx";
 import BetsPage, {
@@ -21,6 +21,7 @@ import {
     action as newBetAction,
 } from "./components/CreateBetRequestForm";
 import { loader as SideDrawLoader } from "./components/SideDraw";
+import ErrorPage from "./pages/Error.jsx";
 
 async function rootLoader() {
     const token = await tokenLoader();
@@ -28,7 +29,7 @@ async function rootLoader() {
     const promises = [];
 
     let username = null;
-    if (token) {
+    if (token && token !== "EXPIRED") {
         username = await usernameLoader();
         promises.push(SideDrawLoader());
     }
@@ -43,6 +44,7 @@ const router = createBrowserRouter([
         path: "/",
         element: <RootLayout />,
         loader: rootLoader,
+        errorElement: <ErrorPage />,
         id: "root",
         children: [
             {
@@ -55,6 +57,7 @@ const router = createBrowserRouter([
             {
                 path: "bets",
                 id: "bets",
+                loader: checkAuth,
                 children: [
                     {
                         index: true,

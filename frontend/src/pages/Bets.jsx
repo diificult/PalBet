@@ -19,7 +19,7 @@ export default function BetsPage() {
             <ChooseWinner />
             <NavLink
                 to="new"
-                className="bg-green-600 rounded-sm p-4 m-4 drop-shadow-2xl text-white "
+                className="bg-green-600 rounded-sm p-4 mb-56 drop-shadow-2xl text-white "
             >
                 Create new bet
             </NavLink>

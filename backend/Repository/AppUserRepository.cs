@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PalBet.Data;
 using PalBet.Interfaces;
+using PalBet.Models;
 
 namespace PalBet.Repository
 {
@@ -25,6 +26,11 @@ namespace PalBet.Repository
             user.PersonalCoins += value;
             await _context.SaveChangesAsync();
             return user.PersonalCoins;
+        }
+
+        public async Task<AppUser> GetUserAsync(string id)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
         }
     }
 }
