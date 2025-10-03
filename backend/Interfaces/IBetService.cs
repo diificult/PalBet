@@ -8,7 +8,7 @@ namespace PalBet.Interfaces
     {
         Task<Bet> CreateBet(CreateBetDto betDto, string betHost);
         //Gets the bets that others have requested on you.
-        Task<List<Bet>?> GetBetRequests(string userId);
+        Task<List<BetDto>?> GetBetRequests(string userId);
         //Gets the bets that you have requested.
         Task<List<Bet>?> GetRequestedBets(string userId);
         //Allows a user to accept a bet
@@ -20,5 +20,6 @@ namespace PalBet.Interfaces
         Task<List<BetDto>?> GetBetsByState(string userId, BetState? betState);
         Task<bool> DeleteBet(string userId, int betId);
         Task<bool> CancelBet(string userId, int betId);
+        Task<Bet> GetBetById (int betId);
     }
 }

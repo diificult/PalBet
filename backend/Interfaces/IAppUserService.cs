@@ -1,4 +1,6 @@
-﻿namespace PalBet.Interfaces
+﻿using PalBet.Models;
+
+namespace PalBet.Interfaces
 {
     public interface IAppUserService
     {

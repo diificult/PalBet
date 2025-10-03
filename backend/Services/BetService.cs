@@ -12,14 +12,16 @@ namespace PalBet.Services
     public class BetService : IBetService
     {
 
-        public readonly IBetRepository _betRepository;
-        public readonly IAppUserRepository _userRepository;
-        public readonly UserManager<AppUser> _userManager;
+        private readonly IBetRepository _betRepository;
+        private readonly IAppUserRepository _userRepository;
+        private readonly INotificationService _notificationService;
+        private readonly UserManager<AppUser> _userManager;
 
-        public BetService(IBetRepository betRepository, IAppUserRepository appUserRepository, UserManager<AppUser> userManager)
+        public BetService(IBetRepository betRepository, IAppUserRepository appUserRepository, INotificationService notificationService, UserManager<AppUser> userManager)
         {
             _betRepository = betRepository;
             _userRepository = appUserRepository;
+            _notificationService = notificationService;
             _userManager = userManager;
         }
 
@@ -58,8 +60,10 @@ namespace PalBet.Services
                     {
                         return false;
                     }
+                    await _notificationService.CreateNotification(NotificationType.BetInPlay, betId.ToString(), p.appUserId);
                 }
                 await _betRepository.SaveAsync();
+                
                 bet.state = BetState.InPlay;
 
             }
@@ -144,13 +148,19 @@ namespace PalBet.Services
             }
 
 
-            //To do: Validation
-            return await _betRepository.CreateBet(betModel);
+            var createdBet = await _betRepository.CreateBet(betModel);
+            foreach (BetParticipant bp in createdBet.Participants)
+            {
+                if (!bp.isBetHost) await _notificationService.CreateNotification(NotificationType.BetRequest, createdBet.Id.ToString(), bp.appUserId);
+            }
+          
+            return createdBet;
         }
 
-        public async Task<List<Bet>?> GetBetRequests(string userId)
+        public async Task<List<BetDto>?> GetBetRequests(string userId)  
         {
-            return await _betRepository.GetBetRequests(userId);
+            var bets = await _betRepository.GetBetRequests(userId);
+            return bets.Select(bet => bet.toBetDtoFromBets(userId)).ToList();
         }
 
         public async Task<List<BetDto>?> GetBetsByState(string userId, BetState? betState)
@@ -185,8 +195,13 @@ namespace PalBet.Services
            await _userRepository.UpdateCoins(winnerUserId, betId);
             bet.UserWinner = winnerUserId;
             bet.state = BetState.Completed;
+            
 
             await _betRepository.SaveAsync();
+            foreach (BetParticipant bp in bet.Participants)
+            {
+                await _notificationService.CreateNotification(NotificationType.WinnerChosen, betId.ToString(), bp.appUserId);
+            }
 
             return true;
             
@@ -219,6 +234,12 @@ namespace PalBet.Services
 
             return true;
 
+        }
+
+        public async Task<Bet> GetBetById(int betId)
+        {
+            return await _betRepository.GetByIdAsync(betId);
+            
         }
     }
 

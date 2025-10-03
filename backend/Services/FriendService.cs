@@ -9,9 +9,11 @@ namespace PalBet.Services
     {
 
         private readonly IFriendRepository _friendRepository;
-        public FriendService(IFriendRepository friendRepository)
+        private readonly INotificationService _notificationService;
+        public FriendService(IFriendRepository friendRepository, INotificationService notificationService)
         {
             _friendRepository = friendRepository;
+            _notificationService = notificationService;
         }
 
         public async Task<bool> AcceptRequest(string requesterId, string AccepteeId)
@@ -55,7 +57,10 @@ namespace PalBet.Services
     
             Console.WriteLine("Now adding");
 
-            return await _friendRepository.CreateFriendship(newFriendship);
+            var createdFriendship = await _friendRepository.CreateFriendship(newFriendship);
+
+            var createdNotification = await _notificationService.CreateNotification(Enums.NotificationType.FriendRequest, requesterId, requesteeId);
+            return createdFriendship;
         }
 
         public  async Task<List<FriendDto>?> GetFriendRequested(string userId)

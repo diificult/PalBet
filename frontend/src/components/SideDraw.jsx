@@ -23,6 +23,7 @@ import defaultimg from "../assets/default.jpg";
 import { sendHttpRequest } from "../hooks/useHttp";
 import { Suspense } from "react";
 import { getAuthToken } from "../util/auth";
+import { Home } from "@mui/icons-material";
 const drawerWidth = 340;
 
 export default function SideDraw() {
@@ -43,7 +44,7 @@ export default function SideDraw() {
                 variant="permanent"
                 anchor="left"
             >
-                {token && (
+                {token && sideData && (
                     <div className=" p-3 flex">
                         <div className="p-2">
                             <img
@@ -55,29 +56,68 @@ export default function SideDraw() {
                             <p className="font-bold text-3xl">{username}</p>
                             <Suspense fallback={<p>Loading...</p>}>
                                 <Await resolve={sideData}>
-                                    {(loadedCoins) => (
-                                        <p>{loadedCoins} coins</p>
-                                    )}
+                                    {(loadedData) =>
+                                        loadedData.coins && (
+                                            <p> {loadedData.coins} coins</p>
+                                        )
+                                    }
                                 </Await>
                             </Suspense>
                         </div>
                     </div>
                 )}
                 <Divider />
+                {token && sideData && (
+                    <>
+                        <List>
+                            <ListItem disablePadding>
+                                <ListItemButton
+                                    component={NavLink}
+                                    to="/notifications"
+                                >
+                                    <ListItemIcon>
+                                        <Suspense
+                                            fallback={
+                                                <p className="bg-gray-500 rounded-full px-5 text-white">
+                                                    ...
+                                                </p>
+                                            }
+                                        >
+                                            <Await resolve={sideData}>
+                                                {(loadedData) => (
+                                                    <p
+                                                        className={
+                                                            loadedData
+                                                                .notificationCount
+                                                                .value > 0
+                                                                ? "bg-red-500 rounded-full px-5 text-white"
+                                                                : "bg-gray-500 rounded-full px-5 text-white"
+                                                        }
+                                                    >
+                                                        {
+                                                            loadedData.notificationCount
+                                                        }
+                                                    </p>
+                                                )}
+                                            </Await>
+                                        </Suspense>
+                                    </ListItemIcon>
+                                    <ListItemText primary="Notification" />
+                                </ListItemButton>
+                            </ListItem>
+                        </List>
+                        <Divider />
+                    </>
+                )}
                 <List>
                     <ListItem disablePadding>
-                        <ListItemButton>
+                        <ListItemButton component={NavLink} to="/">
                             <ListItemIcon>
-                                <p className="bg-gray-500 rounded-full px-5 text-white">
-                                    0
-                                </p>
+                                <Home></Home>
                             </ListItemIcon>
-                            <ListItemText primary="Notification" />
+                            <ListItemText primary="Home" />
                         </ListItemButton>
                     </ListItem>
-                </List>
-                <Divider />
-                <List>
                     <ListItem disablePadding>
                         <ListItemButton component={NavLink} to="/friends">
                             <ListItemIcon>
@@ -151,11 +191,25 @@ export default function SideDraw() {
 }
 
 export async function loader() {
-    return getCoins();
+    return {
+        coins: getCoins(),
+        notificationCount: getNotifications(),
+    };
 }
 
 async function getCoins() {
     const response = await sendHttpRequest("/GetCoins", {
+        method: "Get",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + getAuthToken(),
+        },
+    });
+    const resData = await response.json();
+    return resData;
+}
+async function getNotifications() {
+    const response = await sendHttpRequest("/Notification/GetCount", {
         method: "Get",
         headers: {
             "Content-Type": "application/json",

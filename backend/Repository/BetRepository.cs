@@ -39,7 +39,7 @@ namespace PalBet.Repository
 
         public async Task<List<Bet>?> GetBetRequests(string userId)
         {
-            var bets = await _context.bets.Where(b => b.Participants.Any(p => p.appUserId == userId && !p.Accepted) && b.state == BetState.Requested).ToListAsync();
+            var bets = await _context.bets.Where(b => b.Participants.Any(p => p.appUserId == userId && !p.Accepted) && b.state == BetState.Requested).Include(b=> b.Participants).ThenInclude(p=>p.appUser).ToListAsync();
             return bets;
         }
 

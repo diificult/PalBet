@@ -13,5 +13,6 @@ namespace PalBet.Services
         {
             return await _AppUserRepository.GetCoins(id);
         }
+        
     }
 }

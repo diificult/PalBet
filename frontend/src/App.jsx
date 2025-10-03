@@ -22,6 +22,9 @@ import {
 } from "./components/CreateBetRequestForm";
 import { loader as SideDrawLoader } from "./components/SideDraw";
 import ErrorPage from "./pages/Error.jsx";
+import NotificationPage, {
+    loader as notificationsLoader,
+} from "./pages/Notifications.jsx";
 
 async function rootLoader() {
     const token = await tokenLoader();
@@ -29,6 +32,7 @@ async function rootLoader() {
     const promises = [];
 
     let username = null;
+    console.log(token);
     if (token && token !== "EXPIRED") {
         username = await usernameLoader();
         promises.push(SideDrawLoader());
@@ -72,6 +76,12 @@ const router = createBrowserRouter([
                         action: newBetAction,
                     },
                 ],
+            },
+            {
+                path: "notifications",
+                id: "notifications",
+                element: <NotificationPage />,
+                loader: notificationsLoader,
             },
             {
                 path: "auth",

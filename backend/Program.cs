@@ -112,6 +112,8 @@ builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
 builder.Services.AddScoped<IAppUserService, AppUserService>();
 builder.Services.AddScoped<IFriendRepository, FriendRepository>();
 builder.Services.AddScoped<IFriendService, FriendService>();    
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();  
+builder.Services.AddScoped<INotificationService, NotificationService>();    
 
 
 

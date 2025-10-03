@@ -17,6 +17,8 @@ namespace PalBet.Data
 
         public DbSet<Friendship> friendships { get; set; }
 
+        public DbSet<Notification> notification { get; set; }   
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
