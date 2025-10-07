@@ -13,7 +13,7 @@ namespace PalBet.Dtos.Bet
         public string? UserWinner { set; get; }
 
         public BetState BetState { set; get; }
-        public int BetStake { set; get; }
+        public string BetStake { set; get; }
 
         public bool isHost { set; get; } = false;
     }

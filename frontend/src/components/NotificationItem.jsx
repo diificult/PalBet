@@ -5,8 +5,22 @@ import {
     TollOutlined,
 } from "@mui/icons-material";
 import { Button } from "@mui/material";
+import { useSubmit } from "react-router-dom";
 
 export default function NotificationItem({ notification }) {
+    const submit = useSubmit();
+
+    function handleAction(actionType, method) {
+        submit(
+            {
+                friendUsername: notification.payload.fromUserName,
+                action: actionType,
+            },
+            {
+                method: method,
+            }
+        );
+    }
     return (
         <div
             className={
@@ -23,8 +37,22 @@ export default function NotificationItem({ notification }) {
                         a friend!
                     </p>
                     <div className="flex gap-5">
-                        <Button variant="contained">Accept</Button>
-                        <Button variant="text">Decline</Button>
+                        <Button
+                            variant="contained"
+                            onClick={() => {
+                                handleAction("accept", "PUT");
+                            }}
+                        >
+                            Accept
+                        </Button>
+                        <Button
+                            variant="text"
+                            onClick={() => {
+                                handleAction("decline", "PUT");
+                            }}
+                        >
+                            Decline
+                        </Button>
                     </div>
                 </>
             )}
@@ -33,11 +61,12 @@ export default function NotificationItem({ notification }) {
                     <TollOutlined fontSize="large" />
                     <p>
                         {notification.payload.createdByUserName} has sent you a
-                        new bet request - {notification.payload.betTitle}{" "}
+                        new bet request - {notification.payload.betTitle}
                     </p>
                     <div className="flex gap-5">
-                        <Button variant="contained">View</Button>
-                        <Button variant="text">View</Button>
+                        <Button variant="contained" href="/bets">
+                            View
+                        </Button>
                     </div>
                 </>
             )}
@@ -46,7 +75,9 @@ export default function NotificationItem({ notification }) {
                     <PlayArrowOutlined fontSize="large" />
                     <p>{notification.payload.betTitle} is now in play</p>
                     <div className="flex gap-5">
-                        <Button variant="contained">View</Button>
+                        <Button variant="contained" href="/bets">
+                            View
+                        </Button>
                     </div>
                 </>
             )}
@@ -54,11 +85,13 @@ export default function NotificationItem({ notification }) {
                 <>
                     <CelebrationOutlined fontSize="large" />
                     <p>
-                        {notification.payload.winnerUsername} has won{" "}
+                        {notification.payload.winnerUsername} has won
                         {notification.payload.betTitle}!
                     </p>
                     <div className="flex gap-5">
-                        <Button variant="contained">View</Button>
+                        <Button variant="contained" href="/bets">
+                            View
+                        </Button>
                     </div>
                 </>
             )}

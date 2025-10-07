@@ -11,6 +11,11 @@ namespace PalBet.Dtos.Bet
         public List<string> ParticipantUsernames { get; set; }
         [Required]
         public string BetDescription { get; set; }
-        public int BetStake { get; set; }
+        public int? BetStakeCoins { get; set; }
+
+        public string? BetStakeUserInput { get; set; }
+        
+
+        
     }
 }

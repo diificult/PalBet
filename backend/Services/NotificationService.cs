@@ -85,5 +85,18 @@ namespace PalBet.Services
             await _notificationRepository.SaveAsync();
             return notifications;
         }
+
+        public async Task MarkAsComplete(string notifee, string entityId)
+        {
+            var notification = await _notificationRepository.GetNotification(notifee, entityId);
+            if (notification != null)
+            {
+                notification.IsCompleted = true;
+                await _notificationRepository.SaveAsync();
+            }
+            
+            
+
+        }
     }
 }

@@ -20,13 +20,20 @@ namespace PalBet.Repository
             return notification;
         }
 
+        public Task<Notification?> GetNotification(string notifeeId, string entityId)
+        {
+            return _context.notification.FirstOrDefaultAsync(n => n.NotifyeeId == notifeeId && n.EntityId == entityId && !n.IsCompleted);
+        }
+
         public async Task<List<Notification>> GetNotifications(string notifeeId)
         {
-            return await _context.notification.Where(n => n.NotifyeeId == notifeeId).ToListAsync();
+            return await _context.notification.Where(n => n.NotifyeeId == notifeeId && !n.IsCompleted).ToListAsync();
         }
         public async Task SaveAsync()
         {
             await _context.SaveChangesAsync();
         }
+
+       
     }
 }

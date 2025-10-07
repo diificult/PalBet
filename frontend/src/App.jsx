@@ -25,6 +25,8 @@ import ErrorPage from "./pages/Error.jsx";
 import NotificationPage, {
     loader as notificationsLoader,
 } from "./pages/Notifications.jsx";
+import { action as notificationFriendAction } from "./components/NotificationList.jsx";
+import IndexPage from "./pages/Index.jsx";
 
 async function rootLoader() {
     const token = await tokenLoader();
@@ -51,6 +53,10 @@ const router = createBrowserRouter([
         errorElement: <ErrorPage />,
         id: "root",
         children: [
+            {
+                index: true,
+                element: <IndexPage />,
+            },
             {
                 path: "friends",
                 id: "friends",
@@ -82,6 +88,7 @@ const router = createBrowserRouter([
                 id: "notifications",
                 element: <NotificationPage />,
                 loader: notificationsLoader,
+                action: notificationFriendAction,
             },
             {
                 path: "auth",

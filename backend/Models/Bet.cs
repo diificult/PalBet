@@ -8,8 +8,10 @@ namespace PalBet.Models
         public ICollection<BetParticipant> Participants { get; set; } = new List<BetParticipant>();
         public string BetDescription { get; set; }
         public string? UserWinner { get; set; } = string.Empty;
-        public BetState state { get; set; }
-        public int BetStake { get; set; }
+        public BetState State { get; set; }
+        public BetStakeType BetType { get; set; }
+        public int? Coins { get; set; }
+        public string? UserInput { get; set; }
 
         //TODO??? Bet start datetime, bet deadline.
 

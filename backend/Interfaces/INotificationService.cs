@@ -10,5 +10,6 @@ namespace PalBet.Interfaces
 
         public Task<List<NotificationDto>> GetNotifications(string notifeeId   );
         public Task<int> GetNotificationCount(string notifeeId);
+        public Task MarkAsComplete(string notifee, string entityId);
     }
 }

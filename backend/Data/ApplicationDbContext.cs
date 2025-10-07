@@ -45,6 +45,7 @@ namespace PalBet.Data
                 .HasOne(bp => bp.appUser)
                 .WithMany(u => u.BetsParticipation)
                 .HasForeignKey(bp => bp.appUserId);
+
             builder.Entity<IdentityRole>().HasData(
 
 

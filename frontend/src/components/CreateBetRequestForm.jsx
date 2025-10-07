@@ -15,6 +15,7 @@ import { getAuthToken } from "../util/auth";
 export default function CreateBetRequestForm({ method }) {
     const { friendsList } = useLoaderData();
     const [friends, setFriends] = useState(() => []);
+    const [selectedMode, setSelectedMode] = useState("coins");
 
     const handleFriends = (event, newFormats) => {
         setFriends(newFormats);
@@ -42,10 +43,19 @@ export default function CreateBetRequestForm({ method }) {
                     ></Input>
                 </div>
                 <div className="font-extrabold p-10 m-5">
+                    <label className="font-extrabold">Bet Type</label>
+                    <select
+                        name="betType"
+                        value={selectedMode}
+                        onChange={(e) => setSelectedMode(e.target.value)}
+                    >
+                        <option value="coin">Coins</option>
+                        <option value="input">User Input</option>
+                    </select>
                     <label className="font-extrabold">Bet Value</label>
                     <Input
                         id="bet"
-                        type="number"
+                        type={selectedMode == "coin" ? "number" : "text"}
                         name="bet"
                         variant="outline"
                         required
@@ -53,7 +63,7 @@ export default function CreateBetRequestForm({ method }) {
                     ></Input>
                 </div>
 
-                <div className="font-extrabold p-10 m-5">
+                <div className="font-extrabold p-10 m-5 hidden">
                     <Input
                         id="deadline"
                         type="datetime-local"
@@ -147,12 +157,18 @@ export async function loader() {
 
 export async function action({ request }) {
     const formData = await request.formData();
-    const betModel = {
-        participantUsernames: JSON.parse(formData.get("friends")),
-        betDescription: formData.get("desc"),
-        betStake: formData.get("bet"),
+    let betModel = {
+        ParticipantUsernames: JSON.parse(formData.get("friends")),
+        BetDescription: formData.get("desc"),
     };
-    console.log(betModel);
+    if (formData.get("betType") == "coin") {
+        betModel = { ...betModel, BetStakeCoins: formData.get("bet") };
+    } else if (formData.get("betType") == "input") {
+        betModel = { ...betModel, BetStakeUserInput: formData.get("bet") };
+    } else {
+        console.log("error getting data");
+        return null;
+    }
 
     const response = await sendHttpRequest("/Bet/CreateBet", {
         method: "POST",

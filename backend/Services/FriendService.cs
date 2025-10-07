@@ -25,8 +25,8 @@ namespace PalBet.Services
             request.state = Enums.FriendshipState.Friends;
             request.FriendshipTime = DateTime.Now;
 
-            await  _friendRepository.SaveAync();
-
+            await _friendRepository.SaveAync();
+            await _notificationService.MarkAsComplete(AccepteeId, requesterId);
             return true;
 
 

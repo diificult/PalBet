@@ -31,8 +31,8 @@ namespace PalBet.Mappers
                 ParticipantNames = bet.Participants?.Select(b => b.appUser?.UserName).ToList(),
                 BetDescription = bet.BetDescription,
                 UserWinner = bet.UserWinner,
-                BetState = bet.state,
-                BetStake = bet.BetStake,
+                BetState = bet.State,
+                BetStake = bet.BetType == BetStakeType.UserInput ? bet.UserInput : bet.Coins.ToString(),
                 isHost = bet.Participants.Last().appUserId == userId,
 
             };

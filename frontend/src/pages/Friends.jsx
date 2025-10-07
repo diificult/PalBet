@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { sendHttpRequest } from "../hooks/useHttp";
 import { getAuthToken } from "../util/auth";
 import { Await, redirect, useLoaderData } from "react-router-dom";
+import { useFriends } from "../util/friendAction";
 const requestConfig = {};
 
 export default function Friends() {
@@ -131,27 +132,7 @@ export async function action({ request }) {
     const formData = await request.formData();
     const actionType = formData.get("action");
     const friendUsername = formData.get("friendUsername");
-    let endpoint = "";
-    if (actionType === "add") endpoint = "/Friend/SendRequest";
-    if (actionType === "accept") endpoint = "/Friend/AcceptFriendRequest";
-    if (actionType === "decline") endpoint = "/Friend/DeclineFriendRequest";
-    if (actionType === "cancel") endpoint = "/Friend/CancelFriendRequest";
 
-    const response = await sendHttpRequest(endpoint, {
-        method: request.method,
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + getAuthToken(),
-        },
-        body: JSON.stringify(friendUsername),
-    });
-    if (!response.ok) {
-        throw new Response(
-            JSON.stringify({ message: "Could not modify friend status" }),
-            {
-                status: 422,
-            }
-        );
-    }
+    await useFriends(actionType, friendUsername, request.method);
     return redirect("/friends");
 }
