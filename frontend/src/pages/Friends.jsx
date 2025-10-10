@@ -4,12 +4,18 @@ import AddFriend from "../components/AddFriend";
 import { Suspense } from "react";
 import { sendHttpRequest } from "../hooks/useHttp";
 import { getAuthToken } from "../util/auth";
-import { Await, redirect, useLoaderData } from "react-router-dom";
+import {
+    Await,
+    redirect,
+    useActionData,
+    useLoaderData,
+} from "react-router-dom";
 import { useFriends } from "../util/friendAction";
 const requestConfig = {};
 
 export default function Friends() {
     const { friends, friendRequests, friendRequested } = useLoaderData();
+    const data = useActionData();
     return (
         <>
             <Container>
@@ -133,6 +139,13 @@ export async function action({ request }) {
     const actionType = formData.get("action");
     const friendUsername = formData.get("friendUsername");
 
-    await useFriends(actionType, friendUsername, request.method);
-    return redirect("/friends");
+    const response = await useFriends(
+        actionType,
+        friendUsername,
+        request.method
+    );
+    if (response.error) {
+        return response;
+    }
+    return null;
 }

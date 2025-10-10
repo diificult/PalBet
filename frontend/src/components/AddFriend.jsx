@@ -44,6 +44,11 @@ export default function AddFriend() {
                     {isSubmitting ? "Submitting..." : "Send"}
                 </Button>
             </fetcher.Form>
+            {data && (data.error?.title || data.title) && (
+                <p className="text-red-600 font-semibold">
+                    Error: {data.error?.title || data.title}
+                </p>
+            )}
         </div>
     );
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using PalBet.Exceptions;
 using PalBet.Extensions;
 using PalBet.Interfaces;
 using PalBet.Models;
@@ -29,7 +30,7 @@ namespace PalBet.Controllers
             var RequesterUsername = User.GetUsername();
             var RequesterId = await _userManager.FindByNameAsync(RequesterUsername);
             var RequesteeId = await _userManager.FindByNameAsync(Username);
-            if (RequesteeId == null) return NotFound();
+            if (RequesteeId == null) throw new CustomException("This user does not exist", "USER_NOTFOUND", 400);
 
             var newFriendRequest = await _friendService.FriendshipRequest(RequesterId.Id, RequesteeId.Id);
 

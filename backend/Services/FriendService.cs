@@ -1,4 +1,6 @@
-﻿using PalBet.Dtos.Friends;
+﻿using Azure.Core;
+using PalBet.Dtos.Friends;
+using PalBet.Exceptions;
 using PalBet.Interfaces;
 using PalBet.Mappers;
 using PalBet.Models;
@@ -20,7 +22,7 @@ namespace PalBet.Services
         {
             var requesterFriendships = await _friendRepository.GetFriendshipRequested(requesterId);
             var request = requesterFriendships.FirstOrDefault(f => f.RequesteeId == AccepteeId);
-            if (request == null) return false;
+            if (request == null) throw new AppException("This friend request does not exist", "FRIENDREQUEST_NOTFOUND",404);
 
             request.state = Enums.FriendshipState.Friends;
             request.FriendshipTime = DateTime.Now;
@@ -35,18 +37,20 @@ namespace PalBet.Services
         public  async Task<bool> CancelRequest(string requesterId, string requesteeId)
         {
             var friendship = await _friendRepository.DeleteAsync(requesterId, requesteeId);
-            if (friendship == null) return false;
+            if (friendship == null) throw new AppException("This friendship does not exist", "FRIENDSHIP_NOTFOUND", 404);
             else return true;
 
         }
 
         public async Task<Friendship?> FriendshipRequest(string requesterId, string requesteeId)
         {
+
+
             //Check to see if friendship exists
 
             var requesterFriendships = await _friendRepository.GetFriendshipRequested(requesterId);
             var requesteeFriendship = await _friendRepository.GetFriendshipRequested(requesteeId); 
-            if (requesterFriendships.Any(f => f.RequesteeId == requesteeId) || requesteeFriendship.Any(f => f.RequesteeId == requesterId)) return null;
+            if (requesterFriendships.Any(f => f.RequesteeId == requesteeId) || requesteeFriendship.Any(f => f.RequesteeId == requesterId)) throw new AppException("There is already a friendship/request with this user", "FRIENDSHIP_EXISTS", 400); ;
 
             Console.WriteLine("Checked and cleared");
             //Creates new friendship

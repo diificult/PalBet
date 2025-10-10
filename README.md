@@ -150,7 +150,7 @@ Once logged in your bar will update with all your account information. <div/>
 Click on friends page to view friends, requests and requested, and to add new friends
 <img width="1566" height="1326" alt="image" src="https://github.com/user-attachments/assets/c7eb5abb-e685-47e4-a2f3-56fa47f0ac5d" />
 
-Click on bets page to create new bets and view all bets pariticipated in, including requests
+Click on bets page to create new bets and view all bets participated in, including requests
 <img width="1993" height="1324" alt="image" src="https://github.com/user-attachments/assets/b2240b50-8b1b-483d-9ae3-3d9d0d9e3ed0" />
 
 Once on bets page, you can click on create new bet to create a new bet. Fill in these details

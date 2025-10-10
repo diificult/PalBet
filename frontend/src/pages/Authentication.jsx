@@ -33,9 +33,7 @@ export async function action({ request }) {
         body: JSON.stringify(authData),
     });
     if (!response.ok) {
-        throw new Response(JSON.stringify({ message: "Could not auth" }), {
-            status: 422,
-        });
+        return { error: response };
     }
     const resData = await response.json();
     const token = resData.token;
