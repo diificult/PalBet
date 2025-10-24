@@ -64,9 +64,11 @@ export default function CreateBetRequestForm({ method }) {
                     ></Input>
                 </div>
 
-                <div className="font-extrabold p-10 m-5 hidden">
+                <div className="font-extrabold p-10 m-5">
+                    <label className="font-extrabold">Deadline? (optional) </label>
                     <Input
                         id="deadline"
+                        name="deadline"
                         type="datetime-local"
                         min={formattedNow}
                     ></Input>
@@ -162,6 +164,9 @@ export async function action({ request }) {
         ParticipantUsernames: JSON.parse(formData.get("friends")),
         BetDescription: formData.get("desc"),
     };
+    if (formData.get("deadline")) {
+        betModel = {...betModel, Deadline: formData.get("deadline")}
+    }
     if (formData.get("betType") == "coin") {
         betModel = { ...betModel, BetStakeCoins: formData.get("bet") };
     } else if (formData.get("betType") == "input") {
@@ -171,6 +176,7 @@ export async function action({ request }) {
         return null;
     }
 
+    console.log(betModel);
     const response = await sendHttpRequest("/Bet/CreateBet", {
         method: "POST",
         headers: {

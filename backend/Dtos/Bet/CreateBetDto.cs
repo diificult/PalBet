@@ -15,7 +15,8 @@ namespace PalBet.Dtos.Bet
 
         public string? BetStakeUserInput { get; set; }
         
+        public DateTime? Deadline { get; set; }
 
-        
+
     }
 }

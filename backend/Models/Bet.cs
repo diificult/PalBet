@@ -12,8 +12,7 @@ namespace PalBet.Models
         public BetStakeType BetType { get; set; }
         public int? Coins { get; set; }
         public string? UserInput { get; set; }
-
-        //TODO??? Bet start datetime, bet deadline.
+        public DateTime? Deadline { get; set; }
 
     }
 }

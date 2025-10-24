@@ -22,7 +22,7 @@ namespace PalBet.Services
         {
             var requesterFriendships = await _friendRepository.GetFriendshipRequested(requesterId);
             var request = requesterFriendships.FirstOrDefault(f => f.RequesteeId == AccepteeId);
-            if (request == null) throw new AppException("This friend request does not exist", "FRIENDREQUEST_NOTFOUND",404);
+            if (request == null) throw new CustomException("This friend request does not exist", "FRIENDREQUEST_NOTFOUND", 404);
 
             request.state = Enums.FriendshipState.Friends;
             request.FriendshipTime = DateTime.Now;
@@ -34,10 +34,10 @@ namespace PalBet.Services
 
         }
 
-        public  async Task<bool> CancelRequest(string requesterId, string requesteeId)
+        public async Task<bool> CancelRequest(string requesterId, string requesteeId)
         {
             var friendship = await _friendRepository.DeleteAsync(requesterId, requesteeId);
-            if (friendship == null) throw new AppException("This friendship does not exist", "FRIENDSHIP_NOTFOUND", 404);
+            if (friendship == null) throw new CustomException("This friendship does not exist", "FRIENDSHIP_NOTFOUND", 404);
             else return true;
 
         }
@@ -49,16 +49,17 @@ namespace PalBet.Services
             //Check to see if friendship exists
 
             var requesterFriendships = await _friendRepository.GetFriendshipRequested(requesterId);
-            var requesteeFriendship = await _friendRepository.GetFriendshipRequested(requesteeId); 
-            if (requesterFriendships.Any(f => f.RequesteeId == requesteeId) || requesteeFriendship.Any(f => f.RequesteeId == requesterId)) throw new AppException("There is already a friendship/request with this user", "FRIENDSHIP_EXISTS", 400); ;
+            var requesteeFriendship = await _friendRepository.GetFriendshipRequested(requesteeId);
+            if (requesterFriendships.Any(f => f.RequesteeId == requesteeId) || requesteeFriendship.Any(f => f.RequesteeId == requesterId)) throw new CustomException("There is already a friendship/request with this user", "FRIENDSHIP_EXISTS", 400); ;
 
             Console.WriteLine("Checked and cleared");
             //Creates new friendship
-            Friendship newFriendship = new Friendship{
+            Friendship newFriendship = new Friendship
+            {
                 RequesterId = requesterId,
-                RequesteeId = requesteeId,  
+                RequesteeId = requesteeId,
             };
-    
+
             Console.WriteLine("Now adding");
 
             var createdFriendship = await _friendRepository.CreateFriendship(newFriendship);
@@ -67,7 +68,7 @@ namespace PalBet.Services
             return createdFriendship;
         }
 
-        public  async Task<List<FriendDto>?> GetFriendRequested(string userId)
+        public async Task<List<FriendDto>?> GetFriendRequested(string userId)
         {
             var freiendRequests = await _friendRepository.GetFriendshipRequested(userId);
             return freiendRequests?.Select(f => new FriendDto { UserId = f.RequesteeId, Username = f.Requestee.UserName }).ToList();
@@ -85,12 +86,13 @@ namespace PalBet.Services
             var friendships = await _friendRepository.GetFriendships(userId);
             List<FriendDto> friends = new List<FriendDto>();
 
-           foreach (Friendship f in friendships)
+            foreach (Friendship f in friendships)
             {
                 if (f.RequesterId == userId)
                 {
                     friends.Add(f.Requestee.fromFreindshipToFriendDto());
-                } else
+                }
+                else
                 {
                     friends.Add(f.Requester.fromFreindshipToFriendDto());
                 }
@@ -99,8 +101,8 @@ namespace PalBet.Services
 
         }
 
-        
 
-        
+
+
     }
 }

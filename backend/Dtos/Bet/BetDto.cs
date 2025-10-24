@@ -16,5 +16,7 @@ namespace PalBet.Dtos.Bet
         public string BetStake { set; get; }
 
         public bool isHost { set; get; } = false;
+
+        public DateTime? Deadline { set; get; }
     }
 }

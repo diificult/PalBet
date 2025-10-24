@@ -117,7 +117,7 @@ dotnet run
 
 or run via Visual Studio
 
-Ensure your SQL connection string in appsettings.json is valid & when running, you are in HTTPS mode.
+Ensure your SQL connection string in appsettings.json is valid & when running, and you are in HTTPS mode.
 Backend typically runs at https://localhost:7130.
 
 🎨 Frontend (/frontend)
@@ -166,11 +166,11 @@ Once on bets page, you can click on create new bet to create a new bet. Fill in 
 
 -   [x] Website has ability to add friends, create bet with friends and notify users.
 -   [x] Adjust predictions stakes to allow manual input of not just coins.
--   [ ] Introduce error response on screen.
+-   [x] Introduce error response on screen.
 
 #### 0.1.1
 
--   [ ] Update bets with a target end date
+-   [x] Update bets with a target end date
 -   [ ] Create detailed bet view screen.
 
 ### 0.2 - Groups

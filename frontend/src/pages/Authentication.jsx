@@ -22,7 +22,7 @@ export async function action({ request }) {
         Password: data.get("password"),
     };
     if (mode === "register") {
-        authData.email = data.get("email");
+        authData.EmailAddress = data.get("email");
     }
 
     const response = await sendHttpRequest(`/${mode}`, {
