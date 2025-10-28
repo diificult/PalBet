@@ -256,10 +256,15 @@ namespace PalBet.Services
 
         }
 
-        public async Task<Bet> GetBetById(int betId)
+        public async Task<BetDto> GetBetById(string userId, int betId)
         {
-            return await _betRepository.GetByIdAsync(betId);
 
+            var bet = await _betRepository.GetByIdAsync(betId);
+            if (bet.Participants.Where(p => p.appUserId == userId).Any())
+            {
+                return bet.toBetDtoFromBets(userId);
+            }
+            else return null;
         }
     }
 

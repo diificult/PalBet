@@ -166,12 +166,12 @@ Once on bets page, you can click on create new bet to create a new bet. Fill in 
 
 -   [x] Website has ability to add friends, create bet with friends and notify users.
 -   [x] Adjust predictions stakes to allow manual input of not just coins.
--   [ ] Introduce error response on screen.
+-   [x] Introduce error response on screen.
 
 #### 0.1.1
 
--   [ ] Update bets with a target end date
--   [ ] Create detailed bet view screen.
+-   [x] Update bets with a target end date
+-   [x] Create detailed bet view screen.
 
 ### 0.2 - Groups
 

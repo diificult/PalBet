@@ -171,7 +171,7 @@ Once on bets page, you can click on create new bet to create a new bet. Fill in 
 #### 0.1.1
 
 -   [x] Update bets with a target end date
--   [ ] Create detailed bet view screen.
+-   [x] Create detailed bet view screen.
 
 ### 0.2 - Groups
 

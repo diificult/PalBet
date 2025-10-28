@@ -20,6 +20,6 @@ namespace PalBet.Interfaces
         Task<List<BetDto>?> GetBetsByState(string userId, BetState? betState);
         Task<bool> DeleteBet(string userId, int betId);
         Task<bool> CancelBet(string userId, int betId);
-        Task<Bet> GetBetById (int betId);
+        Task<BetDto> GetBetById (string userId,int betId);
     }
 }

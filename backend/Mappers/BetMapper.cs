@@ -12,12 +12,8 @@ namespace PalBet.Mappers
         {
             return new Bet
             {
-             //   BetParticipants = request.ParticipantIds.Select(userId => new BetParticipant
-              //  {
-                 //   AppUserId = userId
-              //  }).ToList()
                 BetDescription = dto.BetDescription,
-
+                Deadline = dto.Deadline,
             };
         }
 
@@ -32,8 +28,9 @@ namespace PalBet.Mappers
                 BetDescription = bet.BetDescription,
                 UserWinner = bet.UserWinner,
                 BetState = bet.State,
-                BetStake = bet.BetType == BetStakeType.UserInput ? bet.UserInput : bet.Coins.ToString(),
+                BetStake = bet.BetType == BetStakeType.UserInput ? bet.UserInput : bet.Coins.ToString() + " Coins",
                 isHost = bet.Participants.Last().appUserId == userId,
+                Deadline = bet.Deadline,
 
             };
         }

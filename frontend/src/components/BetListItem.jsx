@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { useSubmit } from "react-router-dom";
+import { Link, useSubmit } from "react-router-dom";
 import ChooseWinnerContext from "../store/ChooseWinnerContext";
 
 export default function BetListItem({
@@ -38,7 +38,7 @@ export default function BetListItem({
 
     return (
         <div className=" p-12px shadow-2xl border-[1px] border-r-2 bg-gray-50 rounded-md">
-            <h2 className="p-3 text-xl">{title}</h2>
+            <Link to={`${id}`}><h2 className="p-3 text-xl">{title}</h2></Link>
             <div className="font-semibold text-md">Bet Value: {value}</div>
             <div>
                 <strong>Participants:</strong>

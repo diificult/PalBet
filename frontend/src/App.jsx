@@ -27,6 +27,7 @@ import NotificationPage, {
 } from "./pages/Notifications.jsx";
 import { action as notificationFriendAction } from "./components/NotificationList.jsx";
 import IndexPage from "./pages/Index.jsx";
+import BetDetailPage, {loader as betDetailLoader} from "./pages/BetDetails.jsx"
 
 async function rootLoader() {
     const token = await tokenLoader();
@@ -74,6 +75,17 @@ const router = createBrowserRouter([
                         element: <BetsPage />,
                         loader: betsLoader,
                         action: betsAction,
+                    },
+                    {
+                        path: ":betId",
+                        id: "bet-detail",
+                        loader: betDetailLoader,
+                        children: [
+                            {
+                                index: true,
+                                element: <BetDetailPage />
+                            }
+                        ]
                     },
                     {
                         path: "new",

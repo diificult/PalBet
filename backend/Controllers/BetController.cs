@@ -101,6 +101,16 @@ namespace PalBet.Controllers
             return Ok(bets);
         }
 
+        [HttpGet("GetBetFromId/{betId}")]
+        [Authorize]
+        public async Task<IActionResult> GetBetFromId([FromRoute] int betId)
+        {
+            var Username = User.GetUsername();
+            var AppUser = await _userManager.FindByNameAsync(Username);
+            var bet = await _betService.GetBetById(AppUser.Id, betId);
+            return Ok(bet);
+        }
+
         [HttpPut("CancelBet")]
         [Authorize]
         public async Task<IActionResult> CancelBet([FromBody] int betId)
