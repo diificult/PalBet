@@ -1,12 +1,16 @@
 import { useContext } from "react";
 import { Link, useSubmit } from "react-router-dom";
 import ChooseWinnerContext from "../store/ChooseWinnerContext";
+import TollIcon from '@mui/icons-material/Toll';
+import { CalendarToday, People, Toll } from "@mui/icons-material";
 
+import { grey } from '@mui/material/colors';
 export default function BetListItem({
     id,
     title,
     value,
     participants,
+    deadline,
     mode,
     isHost,
 }) {
@@ -37,12 +41,30 @@ export default function BetListItem({
     }
 
     return (
-        <div className=" p-12px shadow-2xl border-[1px] border-r-2 bg-gray-50 rounded-md">
-            <Link to={`${id}`}><h2 className="p-3 text-xl">{title}</h2></Link>
-            <div className="font-semibold text-md">Bet Value: {value}</div>
-            <div>
-                <strong>Participants:</strong>
-                <ul>
+        <div className=" p-12px shadow-sm border-[2px] border-gray-300 bg-gray-50 rounded-md">
+            <div className="px-4" ><Link to={`${id}`}><h2 className="text-base/7 font-semibold text-gray-900">{title}</h2></Link></div>
+            <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 border-t border-gray-300">
+                <div className="flex px-6">
+                    <Toll sx={{color: grey[500]}} /> 
+                    <p className="text-sm/6 font-medium text-gray-900 px-2">Bet:</p>
+                </div> 
+                <p className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{value}</p> 
+            </div>
+                
+                {deadline &&( <div className="px-4 pt-0 pb-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 ">
+                <div className="flex px-6">
+                    <CalendarToday sx={{color: grey[500]}} /> 
+                    <p className="text-sm/6 font-medium text-gray-900 px-2">Deadline:</p>
+                </div> 
+                <p className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{deadline}</p> 
+            </div>)}
+            <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 border-t border-gray-300">
+                <div className="flex px-6">
+                    <People sx={{color: grey[500]}} />
+                    <p className="text-sm/6 font-medium text-gray-900 px-2">Participants:</p>
+                    </div>
+
+                <ul className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
                     {participants && participants.length > 0 ? (
                         participants.map((p, idx) => <li key={idx}>{p}</li>)
                     ) : (
@@ -51,14 +73,14 @@ export default function BetListItem({
                 </ul>
             </div>
             {mode === "betRequest" && (
-                <button
-                    className="p-2 m-3 bg-green-600  rounded-md text-gray-50"
-                    onClick={() => {
-                        handleAction("accept", "PUT");
-                    }}
-                >
-                    Accept
-                </button>
+            <div className="px-4 py-3 flex justify-end border-t border-gray-200">
+                   <button
+                        className="inline-flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                        onClick={() => handleAction("accept", "PUT")}
+                    >
+                        Accept
+                    </button>
+                </div>
             )}
             {mode === "betRequested" && (
                 <button

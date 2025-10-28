@@ -25,24 +25,30 @@ export default function AddFriend() {
     const isSubmitting = navigation.state === "submitting";
     return (
         <div className=" items-center p-24">
-            <h1>Add Friend</h1>
-            <fetcher.Form method="post" className="flex justify-center p-6">
+            <fetcher.Form method="post" className="space-y-3">
                 <input type="hidden" name="action" value="add" />
-                <TextField
+
+                <label htmlFor="friendUsername" className="block text-sm font-medium text-gray-700">
+                    Username
+                </label>
+                <input
                     id="friendUsername"
                     name="friendUsername"
-                    label="Add Friend"
-                    variant="outlined"
                     type="text"
                     required
+                    className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="username"
                 />
-                <Button
-                    variant="contained"
-                    type="submit"
-                    disabled={isSubmitting}
-                >
-                    {isSubmitting ? "Submitting..." : "Send"}
-                </Button>
+
+                <div className="flex justify-end">
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-60"
+                    >
+                        {isSubmitting ? "Sending…" : "Send Request"}
+                    </button>
+                </div>
             </fetcher.Form>
             {data && (data.error?.title || data.title) && (
                 <p className="text-red-600 font-semibold">

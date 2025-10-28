@@ -1,4 +1,3 @@
-import Container from "@mui/material/Container";
 import FriendsList from "../components/FriendsList";
 import AddFriend from "../components/AddFriend";
 import { Suspense } from "react";
@@ -18,51 +17,63 @@ export default function Friends() {
     const data = useActionData();
     return (
         <>
-            <Container>
-                <Suspense
-                    fallback={<p style={{ textAlign: "center" }}>Loading...</p>}
-                >
-                    <Await resolve={friends}>
-                        {(loadedFriends) => (
-                            <FriendsList
-                                friends={loadedFriends}
-                                mode="friend"
-                            />
-                        )}
-                    </Await>
-                </Suspense>
-            </Container>
-            <Container>
-                <AddFriend> </AddFriend>
-            </Container>
-            <Container>
-                <Suspense
-                    fallback={<p style={{ textAlign: "center" }}>Loading...</p>}
-                >
-                    <Await resolve={friendRequests}>
-                        {(loadedRequests) => (
-                            <FriendsList
-                                friends={loadedRequests}
-                                mode="request"
-                            />
-                        )}
-                    </Await>
-                </Suspense>
-            </Container>
-            <Container>
-                <Suspense
-                    fallback={<p style={{ textAlign: "center" }}>Loading...</p>}
-                >
-                    <Await resolve={friendRequested}>
-                        {(loadedRequests) => (
-                            <FriendsList
-                                friends={loadedRequests}
-                                mode="requested"
-                            />
-                        )}
-                    </Await>
-                </Suspense>
-            </Container>
+            <div className="w-full">
+                <div className="flex items-center justify-between mb-6">
+                    <h1 className="text-2xl font-semibold ">Friends</h1>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                   
+                    <div className="lg:col-span-2 space-y-6">
+                        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+                            <h2 className="text-lg font-medium mb-3">Your Friends</h2>
+                            <div className="border-t border-gray-100 pt-3">
+                                <Suspense fallback={<p className="text-center text-gray-500">Loading...</p>}>
+                                    <Await resolve={friends}>
+                                        {(loadedFriends) => (
+                                            <FriendsList friends={loadedFriends} mode="friend" />
+                                        )}
+                                    </Await>
+                                </Suspense>
+                            </div>
+                        </div>
+
+                        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+                            <h2 className="text-lg font-medium mb-3">Friend Requests</h2>
+                            <div className="border-t border-gray-100 pt-3">
+                                <Suspense fallback={<p className="text-center text-gray-500">Loading...</p>}>
+                                    <Await resolve={friendRequests}>
+                                        {(loadedRequests) => (
+                                            <FriendsList friends={loadedRequests} mode="request" />
+                                        )}
+                                    </Await>
+                                </Suspense>
+                            </div>
+                        </div>
+
+                        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+                            <h2 className="text-lg font-medium mb-3">Sent Requests</h2>
+                            <div className="border-t border-gray-100 pt-3">
+                                <Suspense fallback={<p className="text-center text-gray-500">Loading...</p>}>
+                                    <Await resolve={friendRequested}>
+                                        {(loadedRequests) => (
+                                            <FriendsList friends={loadedRequests} mode="requested" />
+                                        )}
+                                    </Await>
+                                </Suspense>
+                            </div>
+                        </div>
+                    </div>
+
+                    <aside className="space-y-6">
+                        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+                            <h3 className="text-lg font-medium mb-2">Add a Friend</h3>
+                        
+                            <AddFriend />
+                        </div>
+                    </aside>
+                </div>
+            </div>
         </>
     );
 }

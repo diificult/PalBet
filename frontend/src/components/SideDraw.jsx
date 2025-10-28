@@ -7,6 +7,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import HomeIcon from "@mui/icons-material/Home";
 import GroupIcon from "@mui/icons-material/Group";
 import MoneyIcon from "@mui/icons-material/Money";
 import GroupsIcon from "@mui/icons-material/Groups";
@@ -23,60 +24,47 @@ import defaultimg from "../assets/default.jpg";
 import { sendHttpRequest } from "../hooks/useHttp";
 import { Suspense } from "react";
 import { getAuthToken } from "../util/auth";
-import { Home } from "@mui/icons-material";
-const drawerWidth = 340;
+import { Group } from "@mui/icons-material";
+const drawerWidth = 256;
 
 export default function SideDraw() {
     const { token, sideData, username } = useRouteLoaderData("root");
     // const { coins } = useLoaderData();
 
     return (
-        <>
-            <Drawer
-                sx={{
-                    width: drawerWidth,
-                    flexShrink: 0,
-                    "& .MuiDrawer-paper": {
-                        width: drawerWidth,
-                        boxSizing: "border-box",
-                    },
-                }}
-                variant="permanent"
-                anchor="left"
-            >
-                {token && sideData && (
-                    <div className=" p-3 flex">
-                        <div className="p-2">
+        <aside className="w-64 flex-shrink-0 bg-white border-r border-gray-200 min-h-screen">
+            <div className="p-4">
+                {token ? (
+                    <>
+                        <div className="flex items-center gap-3">
                             <img
                                 src={defaultimg}
-                                className="rounded-md max-w-16"
+                                className="rounded-md max-w-12"
                             />
+                            <div>
+                                <div className="font-semibold">{username}</div>
+                                <Suspense fallback={<div className="text-sm text-gray-500">...</div>}>
+                                    <Await resolve={sideData}>
+                                        {(loaded) => (
+                                            <div className="text-sm text-gray-500">
+                                                {loaded?.coins ?? 0} coins
+                                            </div>
+                                        )}
+                                    </Await>
+                                </Suspense>
+                            </div>
                         </div>
-                        <div>
-                            <p className="font-bold text-3xl">{username}</p>
-                            <Suspense fallback={<p>Loading...</p>}>
-                                <Await resolve={sideData}>
-                                    {(loadedData) =>
-                                        loadedData.coins && (
-                                            <p> {loadedData.coins} coins</p>
-                                        )
-                                    }
-                                </Await>
-                            </Suspense>
-                        </div>
-                    </div>
+                    </>
+                ) : (
+                    <div className="text-sm text-gray-600">Not signed in</div>
                 )}
-                <Divider />
-                {token && sideData && (
+            </div>
+
+                {token && sideData &&(
                     <>
-                        <List>
-                            <ListItem disablePadding>
-                                <ListItemButton
-                                    component={NavLink}
-                                    to="/notifications"
-                                >
-                                    <ListItemIcon>
-                                        <Suspense
+                    <div className="m-4 border-t border-gray-100" />
+                    <NavLink to="/notifications" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100">
+                        <Suspense
                                             fallback={
                                                 <p className="bg-gray-500 rounded-full px-5 text-white">
                                                     ...
@@ -90,8 +78,8 @@ export default function SideDraw() {
                                                             loadedData
                                                                 .notificationCount
                                                                 .value > 0
-                                                                ? "bg-red-500 rounded-full px-5 text-white"
-                                                                : "bg-gray-500 rounded-full px-5 text-white"
+                                                                ? "bg-red-500 rounded-full px-3 text-white"
+                                                                : "bg-gray-500 rounded-full px-3 text-white"
                                                         }
                                                     >
                                                         {
@@ -101,92 +89,51 @@ export default function SideDraw() {
                                                 )}
                                             </Await>
                                         </Suspense>
-                                    </ListItemIcon>
-                                    <ListItemText primary="Notification" />
-                                </ListItemButton>
-                            </ListItem>
-                        </List>
-                        <Divider />
+                        <span>Notifications</span>
+                    </NavLink>
                     </>
+                ) 
+                }
+
+
+
+                <div className="mt-4 border-t border-gray-100" />
+
+            <nav className="px-2 py-4">
+                <NavLink to="/" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100">
+                    <HomeIcon fontSize="small" /> <span>Home</span>
+                </NavLink>
+                <NavLink to="/friends" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100">
+                    <GroupIcon fontSize="small" /> <span>Friends</span>
+                </NavLink>
+                <NavLink to="/bets" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100">
+                    <MoneyIcon fontSize="small" /> <span>Bets</span>
+                </NavLink>
+                
+                <NavLink to="" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100">
+                    <GroupIcon fontSize="small" /> <span>Groups</span>
+                </NavLink>
+                                <div className="mt-4 border-t border-gray-100" />
+                {!token && (
+                    <NavLink to="/auth?mode=login" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 mt-3">
+                        <LogoutIcon fontSize="small" /> <span>Sign In</span>
+                    </NavLink>
                 )}
-                <List>
-                    <ListItem disablePadding>
-                        <ListItemButton component={NavLink} to="/">
-                            <ListItemIcon>
-                                <Home></Home>
-                            </ListItemIcon>
-                            <ListItemText primary="Home" />
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton component={NavLink} to="/friends">
-                            <ListItemIcon>
-                                <GroupIcon></GroupIcon>
-                            </ListItemIcon>
-                            <ListItemText primary="Friends" />
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem key="Bets" disablePadding>
-                        <ListItemButton component={NavLink} to="/bets">
-                            <ListItemIcon>
-                                <MoneyIcon></MoneyIcon>
-                            </ListItemIcon>
-                            <ListItemText primary="Bets" />
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem key="Groups" disablePadding>
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <GroupsIcon></GroupsIcon>
-                            </ListItemIcon>
-                            <ListItemText primary="Groups" />
-                        </ListItemButton>
-                    </ListItem>
-                </List>
-                <Divider />
-                <List>
-                    {!token && (
-                        <ListItem disablePadding>
-                            <ListItemButton
-                                component={NavLink}
-                                to="/auth?mode=login"
-                            >
-                                <ListItemIcon>
-                                    <LogoutIcon></LogoutIcon>
-                                </ListItemIcon>
-                                <ListItemText primary="Sign In" />
-                            </ListItemButton>
-                        </ListItem>
-                    )}
-                    {!token && (
-                        <ListItem disablePadding>
-                            <ListItemButton
-                                component={NavLink}
-                                to="/auth?mode=register"
-                            >
-                                <ListItemIcon>
-                                    <LogoutIcon></LogoutIcon>
-                                </ListItemIcon>
-                                <ListItemText primary="Sign Up" />
-                            </ListItemButton>
-                        </ListItem>
-                    )}
-                    {token && (
-                        <ListItem key="Signout" disablePadding>
-                            <Form method="post" action="/logout">
-                                <ListItemButton type="submit">
-                                    <ListItemIcon>
-                                        <LogoutIcon></LogoutIcon>
-                                    </ListItemIcon>
-                                    <ListItemText primary="Sign Out" />
-                                </ListItemButton>
-                            </Form>
-                        </ListItem>
-                    )}
-                </List>
-            </Drawer>
-            <Toolbar />
-        </>
+                                {!token && (
+                    <NavLink to="/auth?mode=register" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 mt-3">
+                        <LogoutIcon fontSize="small" /> <span>Sign Up</span>
+                    </NavLink>
+                    
+                )}
+                {token && (
+                    <Form method="post" action="/logout" className="mt-3">
+                        <button type="submit" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 w-full text-left">
+                            <LogoutIcon fontSize="small" /> <span>Sign Out</span>
+                        </button>
+                    </Form>
+                )}
+            </nav>
+        </aside>
     );
 }
 

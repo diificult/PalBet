@@ -2,6 +2,7 @@
 using PalBet.Dtos.Bet;
 using PalBet.Enums;
 using PalBet.Models;
+using System.Globalization;
 
 namespace PalBet.Mappers
 {
@@ -30,7 +31,7 @@ namespace PalBet.Mappers
                 BetState = bet.State,
                 BetStake = bet.BetType == BetStakeType.UserInput ? bet.UserInput : bet.Coins.ToString() + " Coins",
                 isHost = bet.Participants.Last().appUserId == userId,
-                Deadline = bet.Deadline,
+                Deadline = bet.Deadline?.ToString("dd/MM/yy HH:mm"),
 
             };
         }

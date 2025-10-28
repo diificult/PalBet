@@ -13,42 +13,60 @@ export default function FriendItem({ friend, mode }) {
         );
     }
 
-    return (
-        <div className="flex rounded-lg shadow-lg  justify-between">
-            <img src={defaultimg} className="max-w-16 rounded-l-lg" />
-            <strong className="self-center flex p-4">{friend.username}</strong>
-            {mode === "request" && (
-                <>
+   return (
+        <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-3">
+                <img
+                    src={defaultimg}
+                    className="w-12 h-12 object-cover rounded-md"
+                />
+                <div>
+                    <div className="font-medium text-gray-900">
+                        {friend.username}
+                    </div>
+                    {friend.email && (
+                        <div className="text-sm text-gray-500">{friend.email}</div>
+                    )}
+                </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+                {mode === "request" && (
+                    <>
+                        <button
+                            onClick={() => handleAction("accept", "PUT")}
+                            className="inline-flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                        >
+                            Accept
+                        </button>
+
+                        <button
+                            onClick={() => handleAction("decline", "DELETE")}
+                            className="inline-flex items-center px-3 py-1.5 bg-white border border-red-300 text-red-600 text-sm font-medium rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300"
+                        >
+                            Decline
+                        </button>
+                    </>
+                )}
+
+                {mode === "requested" && (
                     <button
-                        onClick={() => {
-                            handleAction("accept", "PUT");
-                        }}
-                        className="font-semibold text-blue-400 p-2.5 hover:underline"
-                    >
-                        Accept
-                    </button>
-                    <button
-                        onClick={() => {
-                            handleAction("decline", "DELETE");
-                        }}
-                        className="font-semibold text-red-400 p-2.5 hover:underline"
-                    >
-                        Decline
-                    </button>
-                </>
-            )}
-            {mode === "requested" && (
-                <>
-                    <button
-                        onClick={() => {
-                            handleAction("cancel", "DELETE");
-                        }}
-                        className="font-semibold text-gray-400 p-2.5 hover:underline"
+                        onClick={() => handleAction("cancel", "DELETE")}
+                        className="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200"
                     >
                         Cancel
                     </button>
-                </>
-            )}
+                )}
+
+                {mode === "friend" && (
+                    <button
+                        onClick={() => handleAction("remove", "DELETE")}
+                        className="inline-flex items-center px-3 py-1.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                    >
+                        Remove
+                    </button>
+                )}
+            </div>
         </div>
     );
 }

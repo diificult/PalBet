@@ -11,6 +11,7 @@ export default function BetList({ bets, mode }) {
                             title={bet.betDescription}
                             value={bet.betStake}
                             participants={bet.participantNames}
+                            deadline={bet.deadline}
                             mode={mode}
                             isHost={bet.isHost}
                         />

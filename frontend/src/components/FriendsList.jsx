@@ -1,22 +1,15 @@
-import { redirect } from "react-router-dom";
-import { sendHttpRequest } from "../hooks/useHttp";
 import FriendItem from "./FriendItem";
-const requestConfig = {};
+
 export default function FriendsList({ friends, mode }) {
     return (
-        <div className="flex flex-col items-center">
-            <p className="font-extrabold text-3xl p-5">
-                {mode === "friend"
-                    ? "Friend"
-                    : mode === "request"
-                    ? "Friend Requests"
-                    : mode === "requested"
-                    ? "Sent Requests"
-                    : ""}
-            </p>
-            <ul>
+        <div className="w-full">
+
+            <ul className="space-y-3">
+                {friends.length === 0 && (
+                    <li className="text-sm text-gray-500">No items to show</li>
+                )}
                 {friends.map((friend) => (
-                    <li key={friend.id}>
+                    <li key={friend.id} className="bg-white border border-gray-100 rounded-md p-3 shadow-sm">
                         <FriendItem friend={friend} mode={mode} />
                     </li>
                 ))}

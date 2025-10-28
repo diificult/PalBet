@@ -27,10 +27,12 @@ function RootLayout() {
     return (
         <>
             <ChooseWinnerContextProvider>
-                <SideDraw />
-                <main>
+            <div className="min-h-screen flex w-full items-start"> 
+                <SideDraw /> 
+                <main className="flex-1 min-h-screen p-6 max-w-full">
                     <Outlet />
                 </main>
+            </div>
             </ChooseWinnerContextProvider>
         </>
     );
