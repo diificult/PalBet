@@ -133,6 +133,8 @@ builder.Services.AddScoped<IFriendRepository, FriendRepository>();
 builder.Services.AddScoped<IFriendService, FriendService>();    
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();  
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IGroupRepository, GroupRepository>();
+builder.Services.AddScoped<IGroupService, GroupService>();
 
 var app = builder.Build();
 

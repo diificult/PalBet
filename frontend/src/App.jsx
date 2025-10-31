@@ -28,6 +28,9 @@ import NotificationPage, {
 import { action as notificationFriendAction } from "./components/NotificationList.jsx";
 import IndexPage from "./pages/Index.jsx";
 import BetDetailPage, {loader as betDetailLoader} from "./pages/BetDetails.jsx"
+import GroupsPage, {loader as groupLoader} from "./pages/Groups.jsx";
+import NewGroupPage from "./pages/NewGroup.jsx";
+import {loader as newGroupLoader, action as newGroupAction} from "./components/CreateGroupForm.jsx";
 
 async function rootLoader() {
     const token = await tokenLoader();
@@ -94,6 +97,24 @@ const router = createBrowserRouter([
                         action: newBetAction,
                     },
                 ],
+            },
+            {
+                path: "groups",
+                id: "groups",
+                loader: checkAuth,
+                children: [
+                    {
+                        index: true,
+                        element: <GroupsPage />,
+                        loader: groupLoader,
+                    },
+                    {
+                        path: "new",
+                        element: <NewGroupPage />,
+                        loader: newGroupLoader,
+                        action: newGroupAction,
+                    }
+                ]
             },
             {
                 path: "notifications",

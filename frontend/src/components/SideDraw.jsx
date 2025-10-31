@@ -78,8 +78,8 @@ export default function SideDraw() {
                                                             loadedData
                                                                 .notificationCount
                                                                 .value > 0
-                                                                ? "bg-red-500 rounded-full px-3 text-white"
-                                                                : "bg-gray-500 rounded-full px-3 text-white"
+                                                                ? "bg-red-500 rounded-full px-2 text-white"
+                                                                : "bg-gray-500 rounded-full px-2 text-white"
                                                         }
                                                     >
                                                         {
@@ -110,7 +110,7 @@ export default function SideDraw() {
                     <MoneyIcon fontSize="small" /> <span>Bets</span>
                 </NavLink>
                 
-                <NavLink to="" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100">
+                <NavLink to="/groups" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100">
                     <GroupIcon fontSize="small" /> <span>Groups</span>
                 </NavLink>
                                 <div className="mt-4 border-t border-gray-100" />

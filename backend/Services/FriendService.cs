@@ -68,23 +68,23 @@ namespace PalBet.Services
             return createdFriendship;
         }
 
-        public async Task<List<FriendDto>?> GetFriendRequested(string userId)
+        public async Task<List<OtherUserDto>?> GetFriendRequested(string userId)
         {
             var freiendRequests = await _friendRepository.GetFriendshipRequested(userId);
-            return freiendRequests?.Select(f => new FriendDto { UserId = f.RequesteeId, Username = f.Requestee.UserName }).ToList();
+            return freiendRequests?.Select(f => new OtherUserDto { UserId = f.RequesteeId, Username = f.Requestee.UserName }).ToList();
         }
 
-        public async Task<List<FriendDto>?> GetFriendRequests(string userId)
+        public async Task<List<OtherUserDto>?> GetFriendRequests(string userId)
         {
 
             var freiendRequests = await _friendRepository.GetFriendshipRequests(userId);
-            return freiendRequests?.Select(f => new FriendDto { UserId = f.RequesterId, Username = f.Requester.UserName }).ToList();
+            return freiendRequests?.Select(f => new OtherUserDto { UserId = f.RequesterId, Username = f.Requester.UserName }).ToList();
         }
 
-        public async Task<List<FriendDto>?> GetFriendsList(string userId)
+        public async Task<List<OtherUserDto>?> GetFriendsList(string userId)
         {
             var friendships = await _friendRepository.GetFriendships(userId);
-            List<FriendDto> friends = new List<FriendDto>();
+            List<OtherUserDto> friends = new List<OtherUserDto>();
 
             foreach (Friendship f in friendships)
             {

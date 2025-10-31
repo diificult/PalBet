@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using PalBet.Dtos.Bet;
 using PalBet.Enums;
+using PalBet.Exceptions;
 using PalBet.Interfaces;
 using PalBet.Mappers;
 using PalBet.Models;
@@ -128,13 +129,13 @@ namespace PalBet.Services
 
             //Error as only one of these should be filled out.
             if (betDto.BetStakeUserInput != null && betDto.BetStakeCoins != null) return null;
+            if (betDto.BetStakeUserInput == null && betDto.BetStakeCoins == null) return null;
 
             BetStakeType BetType = betDto.BetStakeUserInput != null ? BetStakeType.UserInput : BetStakeType.Coins;
 
             foreach (var username in betDto.ParticipantUsernames)
             {
-                var user = await _userManager.FindByNameAsync(username);
-
+                var user = await _userManager.FindByNameAsync(username) ?? throw new CustomException($"User {username} not found", "BET_USER_NOTFOUND", 404);
                 participants.Add(new BetParticipant
                 {
                     appUserId = user.Id,

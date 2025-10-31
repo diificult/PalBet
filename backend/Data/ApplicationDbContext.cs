@@ -19,12 +19,16 @@ namespace PalBet.Data
 
         public DbSet<Notification> notification { get; set; }   
 
+        public DbSet<Group> Groups { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
             builder.Entity<BetParticipant>().HasKey(bp => new { bp.betId, bp.appUserId });
 
             builder.Entity<Friendship>().HasKey(f => new {f.RequesterId, f.RequesteeId});
+            
+            builder.Entity<UserGroup>().HasKey(ug => new { ug.UserId, ug.GroupId });
 
             builder.Entity<Friendship>()
                 .HasOne(f => f.Requester)
@@ -45,6 +49,15 @@ namespace PalBet.Data
                 .HasOne(bp => bp.appUser)
                 .WithMany(u => u.BetsParticipation)
                 .HasForeignKey(bp => bp.appUserId);
+
+            builder.Entity<UserGroup>()
+                .HasOne(ug => ug.User)
+                .WithMany(u => u.UserGroups)
+                .HasForeignKey(ug => ug.UserId);
+            builder.Entity<UserGroup>()
+                .HasOne(ug => ug.Group)
+                .WithMany(g => g.UserGroups)
+                .HasForeignKey(ug => ug.GroupId);
 
             builder.Entity<IdentityRole>().HasData(
 

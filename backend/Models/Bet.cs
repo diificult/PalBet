@@ -14,5 +14,9 @@ namespace PalBet.Models
         public string? UserInput { get; set; }
         public DateTime? Deadline { get; set; }
 
+        public int? GroupId { get; set; }
+        public Group? Group { get; set; }
+        public bool IsGroup => GroupId != null;
+
     }
 }
