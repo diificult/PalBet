@@ -153,6 +153,7 @@ namespace PalBet.Services
                 UserInput = betDto.BetStakeUserInput,
                 UserWinner = null,
                 BetDescription = betDto.BetDescription,
+                GroupId = betDto.GroupId,
 
             };
 

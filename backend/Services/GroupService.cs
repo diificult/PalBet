@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using PalBet.Dtos.Friends;
 using PalBet.Dtos.Groups;
+using PalBet.Exceptions;
 using PalBet.Interfaces;
 using PalBet.Mappers;
 using PalBet.Models;
@@ -46,6 +48,27 @@ namespace PalBet.Services
             var createdGroup = await _groupRepository.CreateAsync(group);
 
             return createdGroup;
+        }
+
+        public async Task<GroupDetailDto> GetGroupDetails(int groupId, string requesterId)
+        {
+            var group = await _groupRepository.GetGroupAsync(groupId);
+            if (!group.UserGroups.Select(u => u.UserId).Contains(requesterId)) throw new CustomException("Requester is not a member of the group", "GROUP_ACCESS_DENIED", 403);
+            var groupDto = group.toGroupDetailDtoFromGroup(requesterId);
+
+            return groupDto;
+        }
+
+        public async Task<List<GroupMemberDto>> GetGroupMembers(int groupId, string requesterId)
+        {
+            
+            var users = await _groupRepository.GetGroupMembersAsync(groupId);
+            if (!users.Select(u => u.User.Id).Contains(requesterId)) throw new CustomException("Requester is not a member of the group", "GROUP_ACCESS_DENIED", 403);
+
+            
+            var usersDto = users.Select(u => u.fromGroupUserToUserDto()).ToList();
+
+            return usersDto;
         }
 
         public async Task<List<GroupDto>> GetUserGroups(string userId)

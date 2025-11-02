@@ -17,6 +17,9 @@ namespace PalBet.Dtos.Bet
         
         public DateTime? Deadline { get; set; }
 
+        public int? GroupId { get; set; }
+
+
 
     }
 }

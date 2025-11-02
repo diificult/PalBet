@@ -13,7 +13,13 @@ namespace PalBet.Models
 
         public bool IsAdmin { get; set; } = false;
 
+       
+
         public int CoinBalance { get; set; } = 0;
 
+
+        //Permissions:
+
+        public bool CanCreateBet { get; set; } = false;
 }
 }

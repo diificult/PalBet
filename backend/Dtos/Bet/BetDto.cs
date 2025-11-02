@@ -18,5 +18,7 @@ namespace PalBet.Dtos.Bet
         public bool isHost { set; get; } = false;
 
         public string? Deadline { set; get; }
+
+        public string? GroupName { set; get; }
     }
 }

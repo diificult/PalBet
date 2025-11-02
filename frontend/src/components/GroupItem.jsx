@@ -23,7 +23,10 @@ export default function GroupItem({name, participants, id}) {
                         <li>No participants</li>
                     )}
                 </ul>
-            </div>
+                
+            </div><div className="px-4 py-4 flex justify-between border-t border-gray-300">
+                    <Link to={`/groups/${id}/bet/new`}><button className="bg-green-500 rounded-md px-4 py-1 text-white">Create new Bet</button> </Link>
+                </div>
             </div>
     )
 }

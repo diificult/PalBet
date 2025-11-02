@@ -1,4 +1,4 @@
-import FriendsList from "../components/FriendsList";
+import UsersList from "../components/UsersList";
 import AddFriend from "../components/AddFriend";
 import { Suspense } from "react";
 import { sendHttpRequest } from "../hooks/useHttp";
@@ -31,7 +31,7 @@ export default function Friends() {
                                 <Suspense fallback={<p className="text-center text-gray-500">Loading...</p>}>
                                     <Await resolve={friends}>
                                         {(loadedFriends) => (
-                                            <FriendsList friends={loadedFriends} mode="friend" />
+                                            <UsersList Users={loadedFriends} mode="friend" />
                                         )}
                                     </Await>
                                 </Suspense>
@@ -44,7 +44,7 @@ export default function Friends() {
                                 <Suspense fallback={<p className="text-center text-gray-500">Loading...</p>}>
                                     <Await resolve={friendRequests}>
                                         {(loadedRequests) => (
-                                            <FriendsList friends={loadedRequests} mode="request" />
+                                            <UsersList Users={loadedRequests} mode="request" />
                                         )}
                                     </Await>
                                 </Suspense>
@@ -57,7 +57,7 @@ export default function Friends() {
                                 <Suspense fallback={<p className="text-center text-gray-500">Loading...</p>}>
                                     <Await resolve={friendRequested}>
                                         {(loadedRequests) => (
-                                            <FriendsList friends={loadedRequests} mode="requested" />
+                                            <UsersList Users={loadedRequests} mode="requested" />
                                         )}
                                     </Await>
                                 </Suspense>

@@ -30,5 +30,18 @@ namespace PalBet.Repository
                 .ToListAsync();
             return groups;
         }
+        
+        public async Task<List<UserGroup>> GetGroupMembersAsync(int groupId)
+        {
+            var group = await _context.Groups.Include(ug => ug.UserGroups).ThenInclude(u => u.User).FirstOrDefaultAsync(g => g.Id == groupId);
+            var users = group.UserGroups.Select(ug => ug.User).ToList();
+            return group.UserGroups.ToList();
+        }
+
+        public async Task<Group> GetGroupAsync(int groupId)
+        {
+            var group = await _context.Groups.Include(ug => ug.UserGroups).ThenInclude(u => u.User).Include(b => b.GroupBets).ThenInclude(p => p.Participants).FirstOrDefaultAsync(g => g.Id == groupId);
+            return group;
+        }
     }
 }

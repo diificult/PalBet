@@ -8,18 +8,18 @@ import {
     useLoaderData,
     useNavigation,
 } from "react-router-dom";
-import FriendItem from "./FriendItem";
+import UserItem from "./UserItem";
 import { Suspense, useState } from "react";
 import { sendHttpRequest } from "../hooks/useHttp";
 import { getAuthToken } from "../util/auth";
 
-export default function CreateBetRequestForm({ method }) {
-    const { friendsList } = useLoaderData();
-    const [friends, setFriends] = useState(() => []);
+export default function CreateBetRequestForm({ method, mode = 'friends' }) {
+    const { participants } = useLoaderData();
+    const [selectedParticipants, setSelectedParticipants] = useState(() => []);
     const [selectedMode, setSelectedMode] = useState("coins");
 
-    const handleFriends = (event, newFormats) => {
-        setFriends(newFormats);
+    const handleParticipants = (event, newFormats) => {
+        setSelectedParticipants(newFormats);
     };
 
     const navigation = useNavigation();
@@ -76,16 +76,16 @@ export default function CreateBetRequestForm({ method }) {
                 <input
                     type="hidden"
                     name="friends"
-                    value={JSON.stringify(friends)}
+                    value={JSON.stringify(selectedParticipants)}
                 />
                 <div className="font-extrabold p-10 m-5">
-                    <label className="font-extrabold">Select Friend(s)</label>
+                    <label className="font-extrabold">Select Participants(s)</label>
                     <Suspense
                         fallback={
                             <p style={{ textAlign: "center" }}>Loading...</p>
                         }
                     >
-                        <Await resolve={friendsList}>
+                        <Await resolve={participants}>
                             {(loadedFriends) => (
                                 <>
                                     {loadedFriends.length === 0 && (
@@ -99,8 +99,8 @@ export default function CreateBetRequestForm({ method }) {
                                     )}
 
                                     <ToggleButtonGroup
-                                        value={friends}
-                                        onChange={handleFriends}
+                                        value={selectedParticipants}
+                                        onChange={handleParticipants}
                                         fullWidth
                                     >
                                         {loadedFriends.map((friend) => (
@@ -108,7 +108,7 @@ export default function CreateBetRequestForm({ method }) {
                                                 value={friend.username}
                                                 key={friend.username}
                                             >
-                                                <FriendItem
+                                                <UserItem
                                                     friend={friend}
                                                     mode="selector"
                                                 />
@@ -152,13 +152,44 @@ async function loadFriends() {
     const resData = await response.json();
     return resData;
 }
-export async function loader() {
+
+export async function loader({ params }) {
+    const groupId = params.groupId;
+    
+    if (groupId) {
+        return {
+            participants: loadGroupMembers(groupId),
+        };
+    }
+    
     return {
-        friendsList: loadFriends(),
+        participants: loadFriends(),
     };
 }
 
-export async function action({ request }) {
+async function loadGroupMembers(groupId) {
+    const response = await sendHttpRequest(`/group/${groupId}/GetMembers`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + getAuthToken(),
+        },
+    });
+    
+    if (!response.ok) {
+        throw new Response(
+            JSON.stringify({ message: "Could not get group members list" }),
+            {
+                status: 422,
+            }
+        );
+    }
+    
+    return response.json();
+}
+
+export async function action({ request, params }) {
+    const groupId = params.groupId;
     const formData = await request.formData();
     let betModel = {
         ParticipantUsernames: JSON.parse(formData.get("friends")),
@@ -174,6 +205,9 @@ export async function action({ request }) {
     } else {
         console.log("error getting data");
         return null;
+    }
+    if (groupId) {
+        betModel = { ...betModel, GroupId: groupId };
     }
 
     console.log(betModel);

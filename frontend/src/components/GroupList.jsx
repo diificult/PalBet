@@ -11,6 +11,7 @@ export default function GroupList({ groups }) {
                                 name={group.name} 
                                 participants = {group.users}
                             />
+                            
                         </li>
                     ))}
                 </ul>

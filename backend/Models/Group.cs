@@ -8,5 +8,7 @@
 
         public int DefaultCoinBalance { get; set; } = 100;
         public ICollection<UserGroup> UserGroups { get; set; } = new List<UserGroup>();
+
+        public ICollection<Bet> GroupBets { get; set; } = new List<Bet>();
     }
 }

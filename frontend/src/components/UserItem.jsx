@@ -1,7 +1,8 @@
 import { useSubmit } from "react-router-dom";
 import defaultimg from "../assets/default.jpg";
+import UserItemDropDown from "./UserItemDropDown";
 
-export default function FriendItem({ friend, mode }) {
+export default function UserItem({ friend, mode }) {
     const submit = useSubmit();
 
     function handleAction(actionType, method) {
@@ -23,10 +24,10 @@ export default function FriendItem({ friend, mode }) {
                 <div>
                     <div className="font-medium text-gray-900">
                         {friend.username}
+                        {friend.role && friend.role === "ADMIN" && (
+                            <p className="inline-flex items-center px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-md ml-2">Admin </p>
+                        )}
                     </div>
-                    {friend.email && (
-                        <div className="text-sm text-gray-500">{friend.email}</div>
-                    )}
                 </div>
             </div>
 
@@ -66,6 +67,12 @@ export default function FriendItem({ friend, mode }) {
                         Remove
                     </button>
                 )}
+                {mode === "groupMember" && (
+                    <>
+                    <p>{friend.balance} coins</p>
+                    <UserItemDropDown />
+</>
+                    )}
             </div>
         </div>
     );

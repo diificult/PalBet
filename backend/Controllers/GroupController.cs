@@ -43,5 +43,30 @@ namespace PalBet.Controllers
 
 
         }
+
+        [HttpGet("{id}/GetMembers")]
+        [Authorize]
+        public async Task<IActionResult> GetGroupMembers([FromRoute] int id)
+        {
+            var Username = User.GetUsername();
+            var appUser = await _userManager.FindByNameAsync(Username);
+
+            var groupMembers = await _groupService.GetGroupMembers(id, appUser.Id);
+            
+
+            return Ok(groupMembers);
+        }
+
+        [HttpGet("{id}/GetDetails")]
+        [Authorize]
+        public async Task<IActionResult> GetGroupDetails([FromRoute] int id)
+        {
+            var Username = User.GetUsername();
+            var appUser = await _userManager.FindByNameAsync(Username);
+            var groupDetails = await _groupService.GetGroupDetails(id, appUser.Id);
+
+            return Ok(groupDetails);
+        } 
+
     }
 }

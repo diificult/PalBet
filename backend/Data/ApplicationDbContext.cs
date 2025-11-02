@@ -54,10 +54,18 @@ namespace PalBet.Data
                 .HasOne(ug => ug.User)
                 .WithMany(u => u.UserGroups)
                 .HasForeignKey(ug => ug.UserId);
+
             builder.Entity<UserGroup>()
                 .HasOne(ug => ug.Group)
                 .WithMany(g => g.UserGroups)
                 .HasForeignKey(ug => ug.GroupId);
+
+            builder.Entity<Group>()
+                .HasMany(g => g.GroupBets)
+                .WithOne(b => b.Group)
+                .HasForeignKey(b => b.GroupId);
+
+            
 
             builder.Entity<IdentityRole>().HasData(
 

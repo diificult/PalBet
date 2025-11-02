@@ -3,7 +3,7 @@ import { Suspense, useState } from "react";
 import { Await, Form, Link, redirect, useLoaderData, useNavigate, useNavigation } from "react-router-dom";
 import { sendHttpRequest } from "../hooks/useHttp";
 import { getAuthToken } from "../util/auth";
-import FriendItem from "./FriendItem";
+import UserItem from "./UserItem";
 
 export default function CreateGroupForm({method}) {
 
@@ -77,7 +77,7 @@ export default function CreateGroupForm({method}) {
                                                 value={friend.username}
                                                 key={friend.username}
                                             >
-                                                <FriendItem
+                                                <UserItem
                                                     friend={friend}
                                                     mode="selector"
                                                 />

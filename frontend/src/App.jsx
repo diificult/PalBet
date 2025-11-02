@@ -31,6 +31,7 @@ import BetDetailPage, {loader as betDetailLoader} from "./pages/BetDetails.jsx"
 import GroupsPage, {loader as groupLoader} from "./pages/Groups.jsx";
 import NewGroupPage from "./pages/NewGroup.jsx";
 import {loader as newGroupLoader, action as newGroupAction} from "./components/CreateGroupForm.jsx";
+import GroupDetailsPage, {loader as groupDetailLoader} from "./pages/GroupDetails.jsx";
 
 async function rootLoader() {
     const token = await tokenLoader();
@@ -107,6 +108,17 @@ const router = createBrowserRouter([
                         index: true,
                         element: <GroupsPage />,
                         loader: groupLoader,
+                    },
+                    {
+                        path:":groupId",
+                        element: <GroupDetailsPage />,
+                        loader: groupDetailLoader,
+                    },
+                    {
+                        path: ":groupId/bet/new",
+                        element: <NewBetPage />,
+                        loader: newBetLoader,
+                        action: newBetAction
                     },
                     {
                         path: "new",
