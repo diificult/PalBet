@@ -7,9 +7,9 @@ namespace PalBet.Mappers
     public static class UserGroupMapper
     {
 
-        public static GroupMemberDto fromGroupUserToUserDto(this UserGroup userGroup)
+        public static GroupMemberDto fromGroupUserToUserDto(this UserGroup userGroup, bool isAdmin)
         {
-            var groupMember = new GroupMemberDto
+        var groupMember =  new GroupMemberDto
             {
                 Username = userGroup.User.UserName,
                 Role = userGroup.IsAdmin ? "ADMIN" : null,
@@ -17,11 +17,12 @@ namespace PalBet.Mappers
                 UserId = userGroup.UserId,
                 
             };
-            if (groupMember.Role == "ADMIN")
+            if (isAdmin)
             {
                 groupMember.CanCreateBets = userGroup.CanCreateBet;
             }
             return groupMember;
+
         }
     }
 }

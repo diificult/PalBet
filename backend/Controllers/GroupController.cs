@@ -66,7 +66,41 @@ namespace PalBet.Controllers
             var groupDetails = await _groupService.GetGroupDetails(id, appUser.Id);
 
             return Ok(groupDetails);
-        } 
+        }
+
+        [HttpPost("AddUser")]
+        [Authorize]
+        public async Task<IActionResult> AddUser([FromBody] AddRemoveUserDto dto)
+        {
+
+            var Username = User.GetUsername();
+            var appUser = await _userManager.FindByNameAsync(Username);
+            var requesteeAppUser = await _userManager.FindByNameAsync(dto.Username);
+
+            await _groupService.AddUser(dto.GroupId, appUser.Id, requesteeAppUser.Id);
+
+            return Ok();
+        }
+        [HttpDelete("RemoveUser")]
+        [Authorize]
+        public async Task<IActionResult> RemoveUser([FromBody] AddRemoveUserDto dto)
+        {
+            var Username = User.GetUsername();
+            var appUser = await _userManager.FindByNameAsync(Username);
+            var requesteeAppUser = await _userManager.FindByNameAsync(dto.Username);
+            await _groupService.RemoveUser(dto.GroupId, appUser.Id, requesteeAppUser.Id);
+            return Ok();
+        }
+
+            [HttpPut("EditGroup")]
+        [Authorize]
+        public async Task<IActionResult> EditGroup([FromBody] EditGroupDto dto)
+        {
+            var Username = User.GetUsername();
+            var appUser = await _userManager.FindByNameAsync(Username);
+            await _groupService.EditGroup(dto, appUser.Id);
+            return Ok();
+        }
 
     }
 }

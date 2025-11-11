@@ -9,6 +9,8 @@ namespace PalBet.Dtos.Groups
 
         public int Id { get; set; }
         public string Name { get; set; }
+
+        public bool IsRequesterAdmin { get; set; }
         public List<GroupMemberDto> Users { get; set; }
 
         public List<BetDto> Bets { get; set; }

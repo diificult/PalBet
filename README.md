@@ -175,10 +175,10 @@ Once on bets page, you can click on create new bet to create a new bet. Fill in 
 
 ### 0.2 - Groups
 
--   [ ] User can create groups with friends.
--   [ ] Group leader can edit settings such as coins for the group.
--   [ ] Create a page for viewing groups and group information.
--   [ ] Group leader can add and remove players.
+-   [x] User can create groups with friends.
+-   [x] Group leader can edit settings such as coins for the group.
+-   [x] Create a page for viewing groups and group information.
+-   [x] Group leader can add and remove players.
 -   [ ] Group leader can adjust permissions of users.
 
 ### 0.3 - Daily Rewards

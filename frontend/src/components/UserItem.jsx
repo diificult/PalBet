@@ -2,7 +2,7 @@ import { useSubmit } from "react-router-dom";
 import defaultimg from "../assets/default.jpg";
 import UserItemDropDown from "./UserItemDropDown";
 
-export default function UserItem({ friend, mode }) {
+export default function UserItem({ friend, mode, isAdmin }) {
     const submit = useSubmit();
 
     function handleAction(actionType, method) {
@@ -70,7 +70,7 @@ export default function UserItem({ friend, mode }) {
                 {mode === "groupMember" && (
                     <>
                     <p>{friend.balance} coins</p>
-                    <UserItemDropDown />
+                    <UserItemDropDown isAdmin={isAdmin} User={friend} />
 </>
                     )}
             </div>

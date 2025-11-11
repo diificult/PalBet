@@ -9,5 +9,6 @@ namespace PalBet.Interfaces
         public Task<List<UserGroup>> GetGroupMembersAsync(int groupId);
 
         public Task<Group> GetGroupAsync(int groupId);
+        public Task SaveAsync();
     }
 }

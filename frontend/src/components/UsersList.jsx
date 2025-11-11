@@ -1,6 +1,6 @@
 import UserItem from "./UserItem";
 
-export default function UsersList({ Users, mode }) {
+export default function UsersList({ Users, mode, isAdmin = false }) {
     return (
         <div className="w-full">
 
@@ -10,7 +10,7 @@ export default function UsersList({ Users, mode }) {
                 )}
                 {Users.map((user) => (
                     <li key={user.id} className="bg-white border border-gray-100 rounded-md p-3 shadow-sm">
-                        <UserItem friend={user} mode={mode} />
+                        <UserItem friend={user} mode={mode} isAdmin={isAdmin}/>
                     </li>
                 ))}
             </ul>

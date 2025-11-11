@@ -13,7 +13,7 @@ import { Suspense, useState } from "react";
 import { sendHttpRequest } from "../hooks/useHttp";
 import { getAuthToken } from "../util/auth";
 
-export default function CreateBetRequestForm({ method, mode = 'friends' }) {
+export default function CreateBetRequestForm({ method, mode = 'friends', groupId = null }) {
     const { participants } = useLoaderData();
     const [selectedParticipants, setSelectedParticipants] = useState(() => []);
     const [selectedMode, setSelectedMode] = useState("coins");

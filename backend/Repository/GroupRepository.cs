@@ -43,5 +43,11 @@ namespace PalBet.Repository
             var group = await _context.Groups.Include(ug => ug.UserGroups).ThenInclude(u => u.User).Include(b => b.GroupBets).ThenInclude(p => p.Participants).FirstOrDefaultAsync(g => g.Id == groupId);
             return group;
         }
+
+        public async Task SaveAsync()
+        {
+            await _context.SaveChangesAsync();
+
+        }
     }
 }
