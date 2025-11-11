@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { Link, useSubmit } from "react-router-dom";
 import ChooseWinnerContext from "../store/ChooseWinnerContext";
 import TollIcon from '@mui/icons-material/Toll';
-import { CalendarToday, People, Toll } from "@mui/icons-material";
+import { Bolt, CalendarToday, Group, People, Toll } from "@mui/icons-material";
 
 import { grey } from '@mui/material/colors';
 export default function BetListItem({
@@ -13,6 +13,8 @@ export default function BetListItem({
     deadline,
     mode,
     isHost,
+    state,
+    groupName
 }) {
     const submit = useSubmit();
     const modelCtx = useContext(ChooseWinnerContext);
@@ -48,8 +50,24 @@ export default function BetListItem({
                     <Toll sx={{color: grey[500]}} /> 
                     <p className="text-sm/6 font-medium text-gray-900 px-2">Bet:</p>
                 </div> 
+                
                 <p className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{value}</p> 
             </div>
+            <div className="px-4 pt-0 pb-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 ">
+                <div className="flex px-6">
+                    <Bolt sx={{color: grey[500]}} />
+                     <p className="text-sm/6 font-medium text-gray-900 px-2">State:</p>
+                    </div>
+                <p className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{state}</p>
+            </div>
+            {groupName && (<div className="px-4 pt-0 pb-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 ">
+                <div className="flex px-6">
+                    <Group sx={{color: grey[500]}} />
+                        <p className="text-sm/6 font-medium text-gray-900 px-2">Group:</p>
+                    </div>
+                <p className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{groupName}</p>
+            </div>)}
+
                 
                 {deadline &&( <div className="px-4 pt-0 pb-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 ">
                 <div className="flex px-6">

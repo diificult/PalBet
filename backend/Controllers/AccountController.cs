@@ -91,7 +91,6 @@ namespace PalBet.Controllers
             var Username = User.GetUsername();
             var appUser = await _userManager.FindByNameAsync(Username);
             var coins = await _appUserService.GetCoins(appUser.Id);
-            if (coins == null) return BadRequest();
             return Ok(coins);
         }
         [HttpGet("GetUsername")]

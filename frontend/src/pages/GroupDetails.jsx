@@ -15,7 +15,7 @@ export default function GroupDetailsPage() {
 
             function handleAction(actionType, method) {
         submit(
-            {  action: actionType },
+            {  action: actionType, },
             {
                 method: method,
             }
@@ -32,13 +32,30 @@ export default function GroupDetailsPage() {
             {(loadedGroup) => (
                 <>
                 <h1 className="text-2xl font-bold mb-4">{loadedGroup.name}</h1>
-                <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 lg:col-span-2">
                             <h2 className="text-lg font-medium mb-3">Group Members</h2>
                             <div className="border-t border-gray-100 pt-3">
                     <UsersList Users={loadedGroup.users} mode="groupMember" isAdmin={loadedGroup.isRequesterAdmin} /> 
                             </div>
                 </div>
-                <div className="mt-6 bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+                <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 lg:col-span-1">
+                    <h2 className="text-lg font-medium mb-3">Enter Username to Add To Group</h2>
+                    <div className="border-t border-gray-100 pt-3">
+                        <Form method="POST" className="mt-2 flex items-center gap-4">
+                            <input 
+                                name="usernameToAdd"
+                                type="text"
+                                placeholder="Enter username"
+                                className="border border-gray-300 rounded px-3 py-1"
+                            />
+                            <button type="submit" className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600" onSubmit={() => handleAction("AddUser", "POST")}> Add User</button>
+                        </Form>
+                    </div>
+                    </div>
+                </div>
+
+                <div className="mt-6 bg-white border border-gray-200 rounded-lg shadow-sm p-4 lg:col-span-2">
                     <h2 className="text-lg font-medium mb-3">Group Bets</h2>
                     <Link to="bet/new" className="mb-4 px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600">Create Bet</Link>
                     <div className="border-t border-gray-100 pt-3">
@@ -46,7 +63,7 @@ export default function GroupDetailsPage() {
                     </div>
                 </div>
 
-                <div className="mt-6 bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+                <div className="mt-6 bg-white border border-gray-200 rounded-lg shadow-sm p-4 lg:col-span-1">
                     <h2 className="text-lg font-medium mb-3">Group Settings</h2>
                     <div className="border-t border-gray-100 pt-3">
                         <div className="text-sm text-gray-500">
@@ -64,6 +81,8 @@ export default function GroupDetailsPage() {
                         </div>
                     </div>
                 </div>
+                
+
                 </>
             )}
         </Await>
@@ -101,11 +120,20 @@ export async function loader({ params }) {
 
 export async function action({ params, request }) {
     const groupId = params.groupId;
-    if (request.action === "removeUserFromGroup") {
-        return RemoveUserFromGroup({groupId, username: request.friendUsername});
+    const formData = await request.formData();
+    const actionType = formData.get("action");
+
+    if (actionType === "removeUserFromGroup") {
+        return RemoveUserFromGroup({ groupId, username: formData.get("friendUsername") });
     }
-    if (request.action === "SaveGroupSettings") {  
-        return EditGroupSettings({groupId, request});
+    if (actionType === "SaveGroupSettings") {
+        return EditGroupSettings({ groupId, request });
+    }
+    if (actionType === "updateUserPermissions") {
+        return UpdateUserPermissions({ groupId, formData });
+    }
+    if (actionType === "AddUser") {
+        return AddUserToGroup({ groupId, usernameToAdd: formData.get("usernameToAdd") });
     }
 
     
@@ -142,7 +170,7 @@ async function EditGroupSettings({groupId, request}) {
 }
 
 async function RemoveUserFromGroup({groupId, username}) {
-    const response = await sendHttpRequestt("/group/RemoveUser", {
+    const response = await sendHttpRequest("/group/RemoveUser", {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
@@ -161,6 +189,58 @@ async function RemoveUserFromGroup({groupId, username}) {
             }
         );
             }
-    return redirect(`/groups/${groupId}`);
+    return redirect(`/groups/${groupId}`); 
  }
+ async function AddUserToGroup({groupId, username}) {
+    const response = await sendHttpRequest("/group/AddUser", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + getAuthToken(),
+        },
+        body: JSON.stringify({
+            groupId: groupId,
+            username: username,
+        }),
+    }); 
+    if (!response.ok) {
+        throw new Response(
+            JSON.stringify({ message: "Could not add user from group" }),
+            {
+                status: 422,
+            }
+        );
+            }
+    return redirect(`/groups/${groupId}`); 
+ }
+
+ async function UpdateUserPermissions({ groupId, formData }) {
+    const username = formData.get("username");
+    const canCreate = formData.get("canCreateBets") === "1";
+
+    const response = await sendHttpRequest("/group/EditUserPermissions", {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + getAuthToken(),
+        },
+        body: JSON.stringify({
+            groupId,
+            username,
+            CanCreateBets: canCreate,
+        }),
+    });
+    if (!response.ok) {
+        throw new Response(
+            JSON.stringify({ message: "Could not update user permissions" }),
+            {
+                status: 422,
+            }
+        );
+    }
+
+    //return null;
+    return redirect(`/groups/${groupId}`);  
+}
+
     

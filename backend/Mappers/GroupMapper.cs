@@ -12,7 +12,7 @@ namespace PalBet.Mappers
             {
                 Id = group.Id,
                 Name = group.Name,
-                Users = group.UserGroups.Select(ug => ug.User.fromFreindshipToFriendDto()).ToList(),
+                Users = group.UserGroups.Select(ug => ug.fromGroupUserToUserDto(false)).ToList(),
             };
         }
 
@@ -25,7 +25,7 @@ namespace PalBet.Mappers
                 Name = group.Name,
                 IsRequesterAdmin = isAdmin,
                 Users = group.UserGroups.Select(ug => ug.fromGroupUserToUserDto(isAdmin)).ToList(),
-                Bets = group.GroupBets.Select(b => b.toBetDtoFromBets(userId)).ToList(),
+                Bets = group.GroupBets.Select(b => b.ToBetDtoFromBets(userId)).ToList(),
                 DefaultCoinAmount = group.DefaultCoinBalance,
             };
         }

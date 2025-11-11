@@ -102,5 +102,15 @@ namespace PalBet.Controllers
             return Ok();
         }
 
+        [HttpPut("EditUserPermissions")]
+        [Authorize]
+        public async Task<IActionResult> EditUserPermissions([FromBody] EditGroupMemberPermissionsDto dto)
+        {
+            var Username = User.GetUsername();
+            var appUser = await _userManager.FindByNameAsync(Username);
+            await _groupService.EditMemberPermissons(dto, appUser.Id);
+            return Ok();
+        }
+
     }
 }

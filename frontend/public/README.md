@@ -193,15 +193,16 @@ Once on bets page, you can click on create new bet to create a new bet. Fill in 
 -   [ ] Better friend search.
 -   [ ] Create notification when end date reached for a bet (May move this sooner) - Likely require something like hangfire or quartz (hopefully so I can learn it).
 
-### 0.5 - Real-time
+### 0.5 - Optimzations
 
 -   [ ] Create more real time to the website, particularly with notifications. Using SignalR.
+-   [ ] Introduce caching, most likely redis.
 
 ### 0.6 - Account
 
- -  [ ] Create account details page w/ editing details
- -  [ ] Gets stats from back end
- -  [ ] Display stats from components
+ -  [ ] Create account details page w/ editing details.
+ -  [ ] Gets stats from back end.
+ -  [ ] Display stats from components.
  
 ### 🎯 STRETCH GOAL - Goals that are out of scope for the moment, but desire to do.
 

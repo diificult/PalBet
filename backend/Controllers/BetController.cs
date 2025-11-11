@@ -84,10 +84,10 @@ namespace PalBet.Controllers
             var AppUser = await _userManager.FindByNameAsync(Username);
             var winnerUserId = await _userManager.FindByNameAsync(dto.winnerUsername);
 
-            var winner = await _betService.SetWinner(winnerUserId.Id, AppUser.Id, dto.betId);
+            await _betService.SetWinner(winnerUserId.Id, AppUser.Id, dto.betId);
 
-            if (winner) return Ok();
-            return BadRequest();
+           return Ok();
+           
         }
 
         [HttpGet("GetBetFromState")]

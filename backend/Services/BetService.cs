@@ -15,13 +15,15 @@ namespace PalBet.Services
         private readonly IAppUserRepository _userRepository;
         private readonly INotificationService _notificationService;
         private readonly UserManager<AppUser> _userManager;
+        private readonly IGroupRepository _groupRepository;
 
-        public BetService(IBetRepository betRepository, IAppUserRepository appUserRepository, INotificationService notificationService, UserManager<AppUser> userManager)
+        public BetService(IBetRepository betRepository, IAppUserRepository appUserRepository, INotificationService notificationService, UserManager<AppUser> userManager, IGroupRepository groupRepository)
         {
             _betRepository = betRepository;
             _userRepository = appUserRepository;
             _notificationService = notificationService;
             _userManager = userManager;
+            _groupRepository = groupRepository;
         }
 
         public async Task<bool> AcceptBet(string userId, int betId)
@@ -143,6 +145,7 @@ namespace PalBet.Services
                     Accepted = username == betHost,
                 });
             }
+            participants = participants.DistinctBy(p => p.appUserId).ToList();
 
             Bet betModel = new Bet
             {
@@ -181,7 +184,7 @@ namespace PalBet.Services
         public async Task<List<BetDto>?> GetBetRequests(string userId)
         {
             var bets = await _betRepository.GetBetRequests(userId);
-            return bets.Select(bet => bet.toBetDtoFromBets(userId)).ToList();
+            return bets.Select(bet => bet.ToBetDtoFromBets(userId)).ToList();
         }
 
         public async Task<List<BetDto>?> GetBetsByState(string userId, BetState? betState)
@@ -189,7 +192,7 @@ namespace PalBet.Services
             var bets = await _betRepository.GetUsersBets(userId);
             if (betState == null) return null;
 
-            return bets.Where(b => b.State == betState).ToList().Select(bet => bet.toBetDtoFromBets(userId)).ToList();
+            return bets.Where(b => b.State == betState ).ToList().Select(bet => bet.ToBetDtoFromBets(userId)).ToList();
         }
 
         public Task<List<Bet>?> GetRequestedBets(string userId)
@@ -197,38 +200,46 @@ namespace PalBet.Services
             return _betRepository.GetRequestedBets(userId);
         }
 
-        public async Task<bool> SetWinner(string winnerUserId, string updaterUserId, int betId)
+        public async Task SetWinner(string winnerUserId, string updaterUserId, int betId)
         {
             var bet = await _betRepository.GetByIdAsync(betId);
 
             //Check to see if the person updating it is the person who should be.
-
-            if (!bet.Participants.FirstOrDefault(p => p.appUserId == updaterUserId).isBetHost) return false;
+            if (!bet.Participants.FirstOrDefault(p => p.appUserId == updaterUserId).isBetHost) throw new CustomException("Only the bet host can set the winner", "BET_SETWINNER_INVALIDUSER", 400);
 
             //Check to see if the bet is still in play.
-            if (bet.State != BetState.InPlay) return false;
+            if (bet.State != BetState.InPlay) throw new CustomException("Bet is not in play", "BET_SETWINNER_INVALIDSTATE", 400);
 
             //Check to see if the winner id exists in the bet
-            if (!bet.Participants.Any(p => p.appUserId == winnerUserId)) return false;
+            if (!bet.Participants.Any(p => p.appUserId == winnerUserId)) throw new CustomException("Winner is not a participant in the bet", "BET_SETWINNER_INVALIDWINNER", 400);
 
             //Otherwise update the bet
-
-            await _userRepository.UpdateCoins(winnerUserId, betId);
-            bet.UserWinner = winnerUserId;
-            bet.State = BetState.Completed;
-
-
-            await _betRepository.SaveAsync();
             foreach (BetParticipant bp in bet.Participants)
             {
                 await _notificationService.MarkAsComplete(bp.appUserId, betId.ToString());
                 await _notificationService.CreateNotification(NotificationType.WinnerChosen, betId.ToString(), bp.appUserId);
             }
+            
+            bet.UserWinner = winnerUserId;
+            bet.State = BetState.Completed;
 
-            return true;
 
+            await _betRepository.SaveAsync();
 
+            if (bet.BetType == BetStakeType.Coins)
+            {
+                if (bet.IsGroup)
+                {
+                    var group = await _groupRepository.GetGroupAsync((int)bet.GroupId);
+                    group.UserGroups.FirstOrDefault(ug => ug.UserId == winnerUserId).CoinBalance += (int)bet.Coins;
+                    await _groupRepository.SaveAsync();
+                }
+                else
+                {
+                    await _userRepository.UpdateCoins(winnerUserId, betId);
+                }
 
+            }
 
         }
 
@@ -264,7 +275,7 @@ namespace PalBet.Services
             var bet = await _betRepository.GetByIdAsync(betId);
             if (bet.Participants.Where(p => p.appUserId == userId).Any())
             {
-                return bet.toBetDtoFromBets(userId);
+                return bet.ToBetDtoFromBets(userId);
             }
             else return null;
         }

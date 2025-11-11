@@ -7,7 +7,7 @@ namespace PalBet.Dtos.Groups
 
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<OtherUserDto> Users { get; set; }
+        public List<GroupMemberDto> Users { get; set; }
 
 
 

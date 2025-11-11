@@ -19,19 +19,20 @@ namespace PalBet.Mappers
         }
 
             
-        public static BetDto toBetDtoFromBets(this Bet bet, string userId)
+        public static BetDto ToBetDtoFromBets(this Bet bet, string userId)
         {
-            
+
             return new BetDto
             {
                 BetId = bet.Id,
                 ParticipantNames = bet.Participants?.Select(b => b.appUser?.UserName).ToList(),
                 BetDescription = bet.BetDescription,
                 UserWinner = bet.UserWinner,
-                BetState = bet.State,
+                BetState = bet.State.ToString(),
                 BetStake = bet.BetType == BetStakeType.UserInput ? bet.UserInput : bet.Coins.ToString() + " Coins",
                 isHost = bet.Participants.Last().appUserId == userId,
                 Deadline = bet.Deadline?.ToString("dd/MM/yy HH:mm"),
+                GroupName = bet.Group?.Name,
 
             };
         }

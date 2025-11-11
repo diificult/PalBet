@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using PalBet.Dtos.Friends;
 using PalBet.Dtos.Groups;
 using PalBet.Exceptions;
 using PalBet.Interfaces;
@@ -41,7 +40,7 @@ namespace PalBet.Services
             };
             group.UserGroups.Add(newUser);
             await _groupRepository.SaveAsync();
-        }  
+        }
         public async Task RemoveUser(int groupId, string requesterId, string requesteeId)
         {
 
@@ -92,7 +91,7 @@ namespace PalBet.Services
             var group = await _groupRepository.GetGroupAsync(dto.GroupId);
             if (!group.UserGroups.FirstOrDefault(u => u.UserId == requesterId).IsAdmin) throw new CustomException("Only admins can edit the group", "GROUP_EDIT_DENIED", 403);
             group.DefaultCoinBalance = dto.DefaultCoinBalance;
-            await _groupRepository.SaveAsync(); 
+            await _groupRepository.SaveAsync();
         }
 
         public async Task<GroupDetailDto> GetGroupDetails(int groupId, string requesterId)
@@ -106,11 +105,11 @@ namespace PalBet.Services
 
         public async Task<List<GroupMemberDto>> GetGroupMembers(int groupId, string requesterId)
         {
-            
+
             var users = await _groupRepository.GetGroupMembersAsync(groupId);
             if (!users.Select(u => u.User.Id).Contains(requesterId)) throw new CustomException("Requester is not a member of the group", "GROUP_ACCESS_DENIED", 403);
 
-            
+
             var usersDto = users.Select(u => u.fromGroupUserToUserDto(false)).ToList();
 
             return usersDto;
@@ -118,11 +117,21 @@ namespace PalBet.Services
 
         public async Task<List<GroupDto>> GetUserGroups(string userId)
         {
-           var groups = await _groupRepository.GetGroupsAsync(userId);
+            var groups = await _groupRepository.GetGroupsAsync(userId);
             var groupsDto = groups.Select(g => g.toGroupDtoFromGroup()).ToList();
             return groupsDto;
         }
 
+        public async Task EditMemberPermissons(EditGroupMemberPermissionsDto dto, string requesterId)
+        {
+            var group = await _groupRepository.GetGroupAsync(dto.GroupId);
+            if (!group.UserGroups.FirstOrDefault(u => u.UserId == requesterId).IsAdmin) throw new CustomException("Only admins can edit member permissions", "GROUP_EDITMEMBERPERMISSIONS_DENIED", 403);
+            var userGroup = group.UserGroups.FirstOrDefault(u => u.User.UserName == dto.Username) ?? throw new CustomException("User is not a member of the group", "GROUP_EDITMEMBERPERMISSIONS_NOTMEMBER", 400);
 
+            userGroup.CanCreateBet = dto.CanCreateBets;
+
+            await _groupRepository.SaveAsync();
+
+        }
     }
 }
