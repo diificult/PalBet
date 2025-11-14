@@ -34,23 +34,23 @@ namespace PalBet.Services
             if (bet == null)
             {
                 //No Bet exists
-                return false;
+                throw new CustomException("Bet not found", "BET_NOTFOUND", 404);
             }
             //Check to see if it is they are included in the bet
             var betParticipant = bet.Participants.FirstOrDefault(b => b.appUserId == userId);
             if (betParticipant == null)
             {
                 //There is no particpant with this id
-                return false;
-                //To do, return reason?
+                throw new CustomException("User is not a participant in this bet", "BET_USER_NOTPARTICIPANT", 404);
             }
             if (betParticipant.Accepted == true)
             {
-                return false;
                 //Already accepted
+                throw new CustomException("User has already accepted this bet", "BET_USER_ALREADYACCEPTED", 400);
             }
 
             betParticipant.Accepted = true;
+            //Check to see if all participants have accepted
             if (!bet.Participants.Any(p => p.Accepted == false))
             {
                 //Remove coins for each player
@@ -62,7 +62,7 @@ namespace PalBet.Services
                         var updatedCoins = user.PersonalCoins - bet.Coins;
                         if (updatedCoins < 0)
                         {
-                            return false;
+                            throw new CustomException($"User {user.UserName} does not have enough coins to accept the bet", "BET_INSUFFICIENT_COINS", 400);
                         }
 
                     }
@@ -96,24 +96,25 @@ namespace PalBet.Services
             if (bet == null)
             {
                 //No Bet exists
-                return false;
+                throw new CustomException("Bet not found", "BET_NOTFOUND", 404);
 
             }
             var betParticipant = bet.Participants.FirstOrDefault(b => b.appUserId == userId);
             if (betParticipant == null)
             {
                 //There is no particpant with this id
-                return false;
-                //To do, return reason?
+                throw new CustomException("User is not a participant in this bet", "BET_USER_NOTPARTICIPANT", 404);
             }
             if (betParticipant.Accepted == true)
             {
-                return false;
+                
                 //Already accepted
+                throw new CustomException("User has already accepted this bet", "BET_USER_ALREADYACCEPTED", 400);
             }
             if (bet.State != BetState.Requested)
             {
-                return false;
+                //Bet is not in requested state
+                throw new CustomException("Bet is not in requested state", "BET_INVALID_STATE", 400);
             }
 
             bet.State = BetState.Rejected;
@@ -164,9 +165,12 @@ namespace PalBet.Services
             //Check to see if all participants have enough coins.
             if (BetType == BetStakeType.Coins)
             {
+
+                if (betDto.BetStakeCoins < 0) throw new CustomException("Bet coins must be greater than 0", "BET_INVALID_COINS", 400);
                 foreach (var p in betModel.Participants)
                 {
-                    if (await _userRepository.GetCoins(p.appUserId) < betModel.Coins) { return null; }
+                    
+                    if (await _userRepository.GetCoins(p.appUserId) < betModel.Coins) throw new CustomException($"User {p.appUserId} does not have enough coins", "BET_INSUFFICIENT_COINS", 400);
                 }
             }
 
@@ -231,7 +235,7 @@ namespace PalBet.Services
                 if (bet.IsGroup)
                 {
                     var group = await _groupRepository.GetGroupAsync((int)bet.GroupId);
-                    group.UserGroups.FirstOrDefault(ug => ug.UserId == winnerUserId).CoinBalance += (int)bet.Coins;
+                    group.UserGroups.FirstOrDefault(ug => ug.UserId == winnerUserId).CoinBalance += (int)(bet.Coins * 0.95f);
                     await _groupRepository.SaveAsync();
                 }
                 else

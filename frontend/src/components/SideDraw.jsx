@@ -16,20 +16,25 @@ import {
     Await,
     Form,
     NavLink,
-    useLoaderData,
     useRouteLoaderData,
+    redirect,
+    useSubmit,
 } from "react-router-dom";
 
 import defaultimg from "../assets/default.jpg";
 import { sendHttpRequest } from "../hooks/useHttp";
-import { Suspense } from "react";
 import { getAuthToken } from "../util/auth";
 import { Group } from "@mui/icons-material";
+import { red } from "@mui/material/colors";
+import { Suspense } from "react";
 const drawerWidth = 256;
 
 export default function SideDraw() {
     const { token, sideData, username } = useRouteLoaderData("root");
     // const { coins } = useLoaderData();
+    console.log(sideData);
+
+    const submit = useSubmit();
 
     return (
         <aside className="w-64 flex-shrink-0 bg-white border-r border-gray-200 min-h-screen">
@@ -46,9 +51,24 @@ export default function SideDraw() {
                                 <Suspense fallback={<div className="text-sm text-gray-500">...</div>}>
                                     <Await resolve={sideData}>
                                         {(loaded) => (
-                                            <div className="text-sm text-gray-500">
-                                                {loaded?.coins ?? 0} coins
-                                            </div>
+                                            <Suspense fallback={<div className="text-sm text-gray-500">Loading...</div>}>
+                                                <Await resolve={Promise.resolve(loaded?.timeRemaining)}>
+                                                    {(timeRemaining) => (
+                                                        <div className="text-sm text-gray-500">
+                                                            {loaded?.coins ?? 0} coins
+                                                            <div>
+                                                                {timeRemaining === "00:00:00" ? (
+                                                                    <Form method="post" action="/">
+                                                                        <button type="submit" className="bg-blue-500 text-white px-2 py-1 rounded-md mt-1">Claim Daily Reward</button>
+                                                                    </Form>
+                                                                ) : (
+                                                                    <div>Daily Reward in: {timeRemaining}</div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </Await>
+                                            </Suspense>
                                         )}
                                     </Await>
                                 </Suspense>
@@ -63,34 +83,24 @@ export default function SideDraw() {
                 {token && sideData &&(
                     <>
                     <div className="m-4 border-t border-gray-100" />
-                    <NavLink to="/notifications" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100">
-                        <Suspense
-                                            fallback={
-                                                <p className="bg-gray-500 rounded-full px-5 text-white">
-                                                    ...
-                                                </p>
-                                            }
-                                        >
-                                            <Await resolve={sideData}>
-                                                {(loadedData) => (
-                                                    <p
-                                                        className={
-                                                            loadedData
-                                                                .notificationCount
-                                                                .value > 0
-                                                                ? "bg-red-500 rounded-full px-2 text-white"
-                                                                : "bg-gray-500 rounded-full px-2 text-white"
-                                                        }
-                                                    >
-                                                        {
-                                                            loadedData.notificationCount
-                                                        }
-                                                    </p>
-                                                )}
-                                            </Await>
-                                        </Suspense>
-                        <span>Notifications</span>
-                    </NavLink>
+                    <Suspense fallback={<div className="text-sm text-gray-500">...</div>}>
+                        <Await resolve={sideData}>
+                            {(loaded) => (
+                                <NavLink to="/notifications" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100">
+                                    <p
+                                        className={
+                                            loaded?.notificationCount > 0
+                                                ? "bg-red-500 rounded-full px-2 text-white"
+                                                : "bg-gray-500 rounded-full px-2 text-white"
+                                        }
+                                    >
+                                        {loaded?.notificationCount ?? 0}
+                                    </p>
+                                    <span>Notifications</span>
+                                </NavLink>
+                            )}
+                        </Await>
+                    </Suspense>
                     </>
                 ) 
                 }
@@ -141,23 +151,36 @@ export async function loader() {
     return {
         coins: getCoins(),
         notificationCount: getNotifications(),
+        timeRemaining: getDailyRewardsTimeRemaining(),
     };
 }
 
 async function getCoins() {
     const response = await sendHttpRequest("/GetCoins", {
-        method: "Get",
+        method: "GET",
         headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + getAuthToken(),
         },
     });
     const resData = await response.json();
+    return resData;
+}
+
+async function getDailyRewardsTimeRemaining() {
+    const response = await sendHttpRequest("/Rewards/CheckLast", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + getAuthToken(),
+        },
+    });
+    const resData = await response.text();
     return resData;
 }
 async function getNotifications() {
     const response = await sendHttpRequest("/Notification/GetCount", {
-        method: "Get",
+        method: "GET",
         headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + getAuthToken(),
@@ -166,3 +189,26 @@ async function getNotifications() {
     const resData = await response.json();
     return resData;
 }
+
+export async function action() {
+    
+ const response = await sendHttpRequest("/Rewards/GetRewards", {
+    method: "PUT",
+    headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + getAuthToken(),
+    },
+    });
+
+    if (!response.ok) {
+        throw new Response(
+            JSON.stringify({ message: "Could not claim daily reward" }),
+            {
+                status: 422,
+            }
+        );
+    }
+
+    return redirect("/");
+}
+

@@ -13,5 +13,6 @@ namespace PalBet.Models
         public ICollection<Friendship> friendshipsRecieved { get; set; } = new List<Friendship>();
 
         public ICollection<UserGroup> UserGroups { get; set; } = new List<UserGroup>();
+        public DateTime DailyRewardLastClaim { get; set; } = DateTime.MinValue;
     }
 }

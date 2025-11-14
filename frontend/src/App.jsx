@@ -32,6 +32,7 @@ import GroupsPage, {loader as groupLoader} from "./pages/Groups.jsx";
 import NewGroupPage from "./pages/NewGroup.jsx";
 import {loader as newGroupLoader, action as newGroupAction} from "./components/CreateGroupForm.jsx";
 import GroupDetailsPage, {loader as groupDetailLoader, action as groupUpdateAction} from "./pages/GroupDetails.jsx";
+import {action as claimRewardsAction} from "./components/SideDraw.jsx";
 
 async function rootLoader() {
     const token = await tokenLoader();
@@ -55,6 +56,7 @@ const router = createBrowserRouter([
         path: "/",
         element: <RootLayout />,
         loader: rootLoader,
+        action: claimRewardsAction,
         errorElement: <ErrorPage />,
         id: "root",
         children: [

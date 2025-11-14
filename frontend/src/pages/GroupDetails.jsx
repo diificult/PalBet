@@ -41,7 +41,7 @@ export default function GroupDetailsPage() {
                 </div>
                 <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 lg:col-span-1">
                     <h2 className="text-lg font-medium mb-3">Enter Username to Add To Group</h2>
-                    <div className="border-t border-gray-100 pt-3">
+                    <div className="border-t border-gray-100 px-6 py-12 justify-center">
                         <Form method="POST" className="mt-2 flex items-center gap-4">
                             <input 
                                 name="usernameToAdd"
