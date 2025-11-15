@@ -1,4 +1,5 @@
 import {
+    CalendarTodayOutlined,
     CelebrationOutlined,
     GroupOutlined,
     PlayArrowOutlined,
@@ -93,6 +94,20 @@ export default function NotificationItem({ notification }) {
                             View
                         </Button>
                     </div>
+                </>
+            )}
+            {notification.notificationType === 4 && (
+                <>
+                    <CalendarTodayOutlined fontSize="large" />
+                    <p>
+                        {notification.payload.betTitle} deadline has been reached. 
+                        Please submit your final decision.
+                        </p>
+                        <div className="flex gap-5">
+                            <Button variant="contained" href="/bets">
+                                View
+                            </Button>
+                        </div>
                 </>
             )}
         </div>

@@ -39,4 +39,10 @@ using PalBet.Models;
             public string WinnerUsername { get; set; }
         }
 
-    }
+        public class BetDeadlineReachedPayload
+        {
+            public int BetId { get; set; }
+            public string BetTitle { get; set; }
+        }   
+
+}

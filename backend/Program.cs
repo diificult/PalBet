@@ -1,23 +1,23 @@
-using PalBet.Data;
-using PalBet.Interfaces;
-using PalBet.Repository;
-using Microsoft.EntityFrameworkCore;
-using PalBet.Services;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.OpenApi.Models;
-using PalBet.Models;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using PalBet.Exceptions;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using PalBet.Data;
+using PalBet.Exceptions;
+using PalBet.Interfaces;
+using PalBet.Models;
+using PalBet.Repository;
+using PalBet.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-builder.Services.AddProblemDetails( options =>
+builder.Services.AddProblemDetails(options =>
 {
     options.CustomizeProblemDetails = ctx =>
     {
@@ -37,9 +37,18 @@ builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-    options.EnableSensitiveDataLogging(true);
-});
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+        options.EnableSensitiveDataLogging(true);
+    });
+builder.Services.AddHangfire(configuration =>
+configuration
+.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+.UseSimpleAssemblyNameTypeSerializer()
+.UseRecommendedSerializerSettings()
+.UseSqlServerStorage(builder.Configuration.GetConnectionString("HangfireConnection")));
+
+builder.Services.AddHangfireServer();
+
 
 builder.Services.AddSwaggerGen(option =>
 {
@@ -130,8 +139,8 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
 builder.Services.AddScoped<IAppUserService, AppUserService>();
 builder.Services.AddScoped<IFriendRepository, FriendRepository>();
-builder.Services.AddScoped<IFriendService, FriendService>();    
-builder.Services.AddScoped<INotificationRepository, NotificationRepository>();  
+builder.Services.AddScoped<IFriendService, FriendService>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IGroupService, GroupService>();
@@ -147,6 +156,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseHangfireDashboard();
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
@@ -154,5 +165,7 @@ app.UseAuthorization();
 app.UseCors("AllowFrontend");
 
 app.MapControllers();
+app.MapHangfireDashboard();
 
 app.Run();
+

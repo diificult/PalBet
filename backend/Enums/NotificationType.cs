@@ -6,5 +6,6 @@
         BetRequest,
         BetInPlay,
         WinnerChosen,
+        BetDeadlineReached,
     }
 }

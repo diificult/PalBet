@@ -5,6 +5,24 @@ import TollIcon from '@mui/icons-material/Toll';
 import { Bolt, CalendarToday, Group, People, Toll } from "@mui/icons-material";
 
 import { grey } from '@mui/material/colors';
+
+// Helper function to check if deadline has passed
+function isDeadlinePassed(deadlineString) {
+    // Parse "dd/MM/yy hh:mm" format
+    const [datePart, timePart] = deadlineString.split(" ");
+    const [day, month, year] = datePart.split("/");
+    const [hours, minutes] = timePart.split(":");
+    
+    const deadline = new Date(
+        parseInt("20" + year), 
+        parseInt(month) - 1, 
+        parseInt(day), 
+        parseInt(hours), 
+        parseInt(minutes)
+    );
+    
+    return new Date() > deadline;
+}
 export default function BetListItem({
     id,
     title,
@@ -74,7 +92,9 @@ export default function BetListItem({
                     <CalendarToday sx={{color: grey[500]}} /> 
                     <p className="text-sm/6 font-medium text-gray-900 px-2">Deadline:</p>
                 </div> 
-                <p className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{deadline}</p> 
+                <p className={`mt-1 text-sm/6 sm:col-span-2 sm:mt-0 ${isDeadlinePassed(deadline) ? "text-red-600 font-semibold" : "text-gray-700"}`}>
+                    {deadline}
+                </p> 
             </div>)}
             <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 border-t border-gray-300">
                 <div className="flex px-6">

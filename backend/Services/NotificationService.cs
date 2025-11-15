@@ -68,6 +68,10 @@ namespace PalBet.Services
                         var winner = await _userManager.FindByIdAsync(bet2.UserWinner);
                         notificationDtos.Add(notification.fromNotifcationToBetWinnerNotificationDto(bet2, winner.UserName));
                         break;
+                    case (NotificationType.BetDeadlineReached):
+                        var bet3 = await _betRepository.GetByIdAsync(int.Parse(notification.EntityId));
+                        notificationDtos.Add(notification.fromNotificationToBetDeadlineReachedNotificationDto(bet3));
+                        break;
                 }
                                     
             }

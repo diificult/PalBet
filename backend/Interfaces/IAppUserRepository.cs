@@ -7,5 +7,7 @@ namespace PalBet.Interfaces
         public Task<int> GetCoins(string id);
         public Task<int> UpdateCoins(string id, int value);
         public Task<AppUser> GetUserAsync(string id);
+
+        public Task SaveAsync();
     }
 }

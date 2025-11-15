@@ -1,4 +1,5 @@
-﻿using PalBet.Interfaces;
+﻿using Hangfire;
+using PalBet.Interfaces;
 
 namespace PalBet.Services
 {
@@ -11,7 +12,9 @@ namespace PalBet.Services
         }
         public async Task<int> GetCoins(string id)
         {
+         
             return await _AppUserRepository.GetCoins(id);
+
         }
         
     }

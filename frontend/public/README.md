@@ -190,7 +190,7 @@ Once on bets page, you can click on create new bet to create a new bet. Fill in 
 
 -   [ ] Better options for host of predictions, perhaps a draw or failed option, one sided.
 -   [ ] Better friend search.
--   [ ] Create notification when end date reached for a bet (May move this sooner) - Likely require something like hangfire or quartz (hopefully so I can learn it).
+-   [x] Create notification when end date reached for a bet - Using hangfire.
 -   [ ] Improve page layout and design.
 
 ### 0.5 - Optimzations

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Hangfire;
+using Hangfire.Client;
+using Microsoft.AspNetCore.Identity;
 using PalBet.Dtos.Bet;
 using PalBet.Enums;
 using PalBet.Exceptions;
@@ -17,7 +19,7 @@ namespace PalBet.Services
         private readonly UserManager<AppUser> _userManager;
         private readonly IGroupRepository _groupRepository;
 
-        public BetService(IBetRepository betRepository, IAppUserRepository appUserRepository, INotificationService notificationService, UserManager<AppUser> userManager, IGroupRepository groupRepository)
+        public BetService(IBetRepository betRepository, IAppUserRepository appUserRepository, INotificationService notificationService, UserManager<AppUser> userManager, IGroupRepository groupRepository )
         {
             _betRepository = betRepository;
             _userRepository = appUserRepository;
@@ -66,17 +68,23 @@ namespace PalBet.Services
                         }
 
                     }
+                    await _userRepository.SaveAsync();
+
                 }
                 foreach (BetParticipant p in bet.Participants)
                 {
                     await _notificationService.MarkAsComplete(p.appUserId, betId.ToString());
                     await _notificationService.CreateNotification(NotificationType.BetInPlay, betId.ToString(), p.appUserId);
+                    if (bet.Deadline.HasValue) BackgroundJob.Schedule(() => _notificationService.CreateNotification(NotificationType.BetDeadlineReached, bet.Id.ToString(), p.appUserId), (DateTime) bet.Deadline);
                 }
 
                 await _betRepository.SaveAsync();
                 bet.State = BetState.InPlay;
 
             }
+
+
+
             await _betRepository.SaveAsync();
 
 
@@ -107,7 +115,7 @@ namespace PalBet.Services
             }
             if (betParticipant.Accepted == true)
             {
-                
+
                 //Already accepted
                 throw new CustomException("User has already accepted this bet", "BET_USER_ALREADYACCEPTED", 400);
             }
@@ -158,8 +166,11 @@ namespace PalBet.Services
                 UserWinner = null,
                 BetDescription = betDto.BetDescription,
                 GroupId = betDto.GroupId,
+                Deadline = betDto.Deadline,
 
             };
+
+            
 
 
             //Check to see if all participants have enough coins.
@@ -169,10 +180,11 @@ namespace PalBet.Services
                 if (betDto.BetStakeCoins < 0) throw new CustomException("Bet coins must be greater than 0", "BET_INVALID_COINS", 400);
                 foreach (var p in betModel.Participants)
                 {
-                    
+
                     if (await _userRepository.GetCoins(p.appUserId) < betModel.Coins) throw new CustomException($"User {p.appUserId} does not have enough coins", "BET_INSUFFICIENT_COINS", 400);
                 }
             }
+
 
 
 
@@ -196,7 +208,7 @@ namespace PalBet.Services
             var bets = await _betRepository.GetUsersBets(userId);
             if (betState == null) return null;
 
-            return bets.Where(b => b.State == betState ).ToList().Select(bet => bet.ToBetDtoFromBets(userId)).ToList();
+            return bets.Where(b => b.State == betState).ToList().Select(bet => bet.ToBetDtoFromBets(userId)).ToList();
         }
 
         public Task<List<Bet>?> GetRequestedBets(string userId)
@@ -223,7 +235,7 @@ namespace PalBet.Services
                 await _notificationService.MarkAsComplete(bp.appUserId, betId.ToString());
                 await _notificationService.CreateNotification(NotificationType.WinnerChosen, betId.ToString(), bp.appUserId);
             }
-            
+
             bet.UserWinner = winnerUserId;
             bet.State = BetState.Completed;
 
