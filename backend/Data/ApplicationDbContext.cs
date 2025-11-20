@@ -21,10 +21,12 @@ namespace PalBet.Data
 
         public DbSet<Group> Groups { get; set; }
 
+        
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.Entity<BetParticipant>().HasKey(bp => new { bp.betId, bp.appUserId });
+            builder.Entity<BetParticipant>().HasKey(bp => new { bp.BetId, bp.AppUserId });
 
             builder.Entity<Friendship>().HasKey(f => new {f.RequesterId, f.RequesteeId});
             
@@ -42,13 +44,13 @@ namespace PalBet.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
             builder.Entity<BetParticipant>()
-                .HasOne(bp => bp.bet)
+                .HasOne(bp => bp.Bet)
                 .WithMany(b => b.Participants)
-                .HasForeignKey(bp => bp.betId);
+                .HasForeignKey(bp => bp.BetId);
             builder.Entity<BetParticipant>()
-                .HasOne(bp => bp.appUser)
+                .HasOne(bp => bp.AppUser)
                 .WithMany(u => u.BetsParticipation)
-                .HasForeignKey(bp => bp.appUserId);
+                .HasForeignKey(bp => bp.AppUserId);
 
             builder.Entity<UserGroup>()
                 .HasOne(ug => ug.User)
@@ -65,7 +67,14 @@ namespace PalBet.Data
                 .WithOne(b => b.Group)
                 .HasForeignKey(b => b.GroupId);
 
-            
+
+            builder.Entity<BetChoice>()
+                .HasOne(c => c.Bet)
+                .WithMany(b => b.Choices)
+                .HasForeignKey(c => c.BetId);
+
+
+
 
             builder.Entity<IdentityRole>().HasData(
 

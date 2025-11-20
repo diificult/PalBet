@@ -188,14 +188,14 @@ Once on bets page, you can click on create new bet to create a new bet. Fill in 
 
 ### 0.4 - Improved options for predictions & design
 
+-   [x] Better options for host of predictions, perhaps a draw or failed option, one sided.
+-   [x] Create notification when end date reached for a bet - Using hangfire.
 -   [ ] Improve page layout and design.
--   [ ] Better options for host of predictions, perhaps a draw or failed option, one sided.
--   [ ] Better friend search.
--   [ ] Create notification when end date reached for a bet (May move this sooner) - Likely require something like hangfire or quartz (hopefully so I can learn it).
 
 ### 0.5 - Real-time
 
 -   [ ] Create more real time to the website, particularly with notifications. Using SignalR.
+-   [ ] Introduce caching, most likely redis.
 
 ### 0.6 - Account
 

@@ -47,7 +47,7 @@ namespace PalBet.Migrations
             migrationBuilder.RenameColumn(
                 name: "BetStake",
                 table: "bets",
-                newName: "BetType");
+                newName: "BetStakeType");
 
             migrationBuilder.AddColumn<int>(
                 name: "Coins",
@@ -116,7 +116,7 @@ namespace PalBet.Migrations
                 newName: "state");
 
             migrationBuilder.RenameColumn(
-                name: "BetType",
+                name: "BetStakeType",
                 table: "bets",
                 newName: "BetStake");
 

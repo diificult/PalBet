@@ -17,6 +17,7 @@ export default function CreateBetRequestForm({ method, mode = 'friends', groupId
     const { participants } = useLoaderData();
     const [selectedParticipants, setSelectedParticipants] = useState(() => []);
     const [selectedMode, setSelectedMode] = useState("coins");
+    const [selectedOutcomeType, setSelectedOutcomeType] = useState("ParticipantAssigned");
 
     const handleParticipants = (event, newFormats) => {
         setSelectedParticipants(newFormats);
@@ -28,10 +29,30 @@ export default function CreateBetRequestForm({ method, mode = 'friends', groupId
     const now = new Date();
     const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
     const formattedNow = local.toISOString().slice(0, 16);
+    /*
+        
+    public string BetDescription { get; set; }
+    public int? BetStakeCoins { get; set; }
+    
+    public string? BetStakeUserInput { get; set; }
+    
+    public DateTime? Deadline { get; set; }
+    
+    public List<string> ParticipantUsernames { get; set; }
+
+
+        public bool AllowMultipleWinners { get; set; } = false;
+        public bool AllowUserSubmittedChoices { get; set; } = false;
+        public bool BurnStakeOnNoWnner { get; set; } = true;
+
+    */
+
+
+    const [numChoices, setNumChoices] = useState(2);
 
     return (
         <>
-            <Form method={method} className="p-5 m-5">
+            <Form method={method} className="flex flex-col items-start m-10">
                 <div className="font-extrabold p-10 m-5">
                     <label className="font-extrabold">Bet Description</label>
                     <Input
@@ -78,6 +99,48 @@ export default function CreateBetRequestForm({ method, mode = 'friends', groupId
                     name="friends"
                     value={JSON.stringify(selectedParticipants)}
                 />
+                <div className="font-extrabold p-10 m-5 flex">
+                    <div className="font-extrabold p-10 m-5">
+                        <label className="font-extrabold">Settings:</label>    
+                        <select name="BetMode" className="m-4" onChange={(e) => setSelectedOutcomeType(e.target.value)} >
+                            <option value="ParticipantAssigned">Default Options ("x" player wins)</option>
+                            <option value="HostDefined">Host Defined Choices</option>
+                            <option value="UserSubmitted">User Submitted Choices</option>
+                        </select>
+                        <input type="checkbox" name="AllowMultipleWinners" /> Allow Multiple Winners
+                        <input type="checkbox" name="BurnStakeOnNoWnner" defaultChecked={true} /> Burn Stake On No Winner
+                    </div>
+                </div>
+
+                {selectedOutcomeType === "HostDefined" && (
+                    <div className="font-extrabold p-10 m-5">
+                        <label className="font-extrabold">Number of Choices (1-32):</label>
+                        <Input
+                            type="number"
+                            min="1"
+                            max="32"
+                            value={numChoices}
+                            onChange={(e) => setNumChoices(Math.min(32, Math.max(1, parseInt(e.target.value) || 1)))}
+                            className="w-20 h-10 p-2 m-4"
+                        />
+                        <div className="font-extrabold p-10 m-5">
+                            <label className="font-extrabold">Input Choices:</label>
+                            {Array.from({ length: numChoices }, (_, i) => (
+                                <Input
+                                    key={`choice_${i}`}
+                                    id={`choice_${i}`}
+                                    type="text"
+                                    name={`choice_${i}`}
+                                    placeholder={`Choice ${i + 1}`}
+                                    variant="outline"
+                                    required
+                                    className="w-96 h-10 p-2 m-4"
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
+                    
                 <div className="font-extrabold p-10 m-5">
                     <label className="font-extrabold">Select Participants(s)</label>
                     <Suspense
@@ -208,6 +271,30 @@ export async function action({ request, params }) {
     }
     if (groupId) {
         betModel = { ...betModel, GroupId: groupId };
+    }
+    const outcomeType = formData.get("BetMode");
+    if (outcomeType === "HostDefined") {
+        const choices = [];
+        for (const [key, value] of formData.entries()) {
+        if (key.startsWith('choice_')) {
+            choices.push(value);
+        }
+    }       
+        betModel = { ...betModel, ChoicesText: choices };
+    }
+    betModel = {
+        ...betModel,
+        OutcomeChoice: outcomeType,}
+
+    if (formData.get("AllowMultipleWinners")) {
+        betModel = { ...betModel, AllowMultipleWinners: true };
+    } else {
+        betModel = { ...betModel, AllowMultipleWinners: false };
+    }
+    if (formData.get("BurnStakeOnNoWnner")) {
+        betModel = { ...betModel, BurnStakeOnNoWinner: true };
+    } else {
+        betModel = { ...betModel, BurnStakeOnNoWinner: false };
     }
 
     console.log(betModel);

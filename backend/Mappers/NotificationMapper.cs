@@ -34,7 +34,7 @@ namespace PalBet.Mappers
                 {
                     BetId = bet.Id,
                     BetTitle = bet.BetDescription,
-                    CreatedByUserName = bet.Participants.Where(p => p.isBetHost).First().appUser.UserName
+                    CreatedByUserName = bet.Participants.Where(p => p.IsBetHost).First().AppUser.UserName
                 }
             };
         }

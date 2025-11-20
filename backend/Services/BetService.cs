@@ -1,5 +1,5 @@
 ﻿using Hangfire;
-using Hangfire.Client;
+using Microsoft.AspNetCore.Connections.Features;
 using Microsoft.AspNetCore.Identity;
 using PalBet.Dtos.Bet;
 using PalBet.Enums;
@@ -7,6 +7,7 @@ using PalBet.Exceptions;
 using PalBet.Interfaces;
 using PalBet.Mappers;
 using PalBet.Models;
+using System.Diagnostics;
 
 namespace PalBet.Services
 {
@@ -19,7 +20,7 @@ namespace PalBet.Services
         private readonly UserManager<AppUser> _userManager;
         private readonly IGroupRepository _groupRepository;
 
-        public BetService(IBetRepository betRepository, IAppUserRepository appUserRepository, INotificationService notificationService, UserManager<AppUser> userManager, IGroupRepository groupRepository )
+        public BetService(IBetRepository betRepository, IAppUserRepository appUserRepository, INotificationService notificationService, UserManager<AppUser> userManager, IGroupRepository groupRepository)
         {
             _betRepository = betRepository;
             _userRepository = appUserRepository;
@@ -28,7 +29,7 @@ namespace PalBet.Services
             _groupRepository = groupRepository;
         }
 
-        public async Task<bool> AcceptBet(string userId, int betId)
+        public async Task<bool> AcceptBet(string userId, int betId, string? choice)
         {
             var bet = await _betRepository.GetByIdAsync(betId);
 
@@ -38,17 +39,41 @@ namespace PalBet.Services
                 //No Bet exists
                 throw new CustomException("Bet not found", "BET_NOTFOUND", 404);
             }
-            //Check to see if it is they are included in the bet
-            var betParticipant = bet.Participants.FirstOrDefault(b => b.appUserId == userId);
+            //Check to see if it is they are included in the Bet
+            var betParticipant = bet.Participants.FirstOrDefault(b => b.AppUserId == userId);
             if (betParticipant == null)
             {
                 //There is no particpant with this id
-                throw new CustomException("User is not a participant in this bet", "BET_USER_NOTPARTICIPANT", 404);
+                throw new CustomException("User is not a participant in this Bet", "BET_USER_NOTPARTICIPANT", 404);
             }
             if (betParticipant.Accepted == true)
             {
                 //Already accepted
-                throw new CustomException("User has already accepted this bet", "BET_USER_ALREADYACCEPTED", 400);
+                throw new CustomException("User has already accepted this Bet", "BET_USER_ALREADYACCEPTED", 400);
+            }
+
+            if (bet.OutcomeChoice == OutcomeChoice.UserSubmitted)
+            {
+                if (string.IsNullOrEmpty(choice))
+                {
+                    throw new CustomException("A choice must be provided to accept this Bet", "BET_USER_CHOICE_REQUIRED", 400);
+                }
+                var createdChoice = new BetChoice { Text = choice };    
+                bet.Choices.Add(createdChoice);
+                betParticipant.SelectedChoice = createdChoice;
+            }
+             else if (bet.OutcomeChoice == OutcomeChoice.HostDefined)
+            {
+                if (string.IsNullOrEmpty(choice))
+                {
+                    throw new CustomException("A choice must be provided to accept this Bet", "BET_USER_CHOICE_REQUIRED", 400);
+                }
+                var selectedChoice = bet.Choices.FirstOrDefault(c => c.Text == choice);
+                if (selectedChoice == null)
+                {
+                    throw new CustomException("The provided choice is not valid for this Bet", "BET_USER_INVALID_CHOICE", 400);
+                }
+                betParticipant.SelectedChoice = selectedChoice;
             }
 
             betParticipant.Accepted = true;
@@ -56,15 +81,15 @@ namespace PalBet.Services
             if (!bet.Participants.Any(p => p.Accepted == false))
             {
                 //Remove coins for each player
-                if (bet.BetType == BetStakeType.Coins)
+                if (bet.BetStakeType == BetStakeType.Coins)
                 {
                     foreach (BetParticipant p in bet.Participants)
                     {
-                        var user = await _userRepository.GetUserAsync(p.appUserId);
+                        var user = await _userRepository.GetUserAsync(p.AppUserId);
                         var updatedCoins = user.PersonalCoins - bet.Coins;
                         if (updatedCoins < 0)
                         {
-                            throw new CustomException($"User {user.UserName} does not have enough coins to accept the bet", "BET_INSUFFICIENT_COINS", 400);
+                            throw new CustomException($"User {user.UserName} does not have enough coins to accept the Bet", "BET_INSUFFICIENT_COINS", 400);
                         }
 
                     }
@@ -73,9 +98,9 @@ namespace PalBet.Services
                 }
                 foreach (BetParticipant p in bet.Participants)
                 {
-                    await _notificationService.MarkAsComplete(p.appUserId, betId.ToString());
-                    await _notificationService.CreateNotification(NotificationType.BetInPlay, betId.ToString(), p.appUserId);
-                    if (bet.Deadline.HasValue) BackgroundJob.Schedule(() => _notificationService.CreateNotification(NotificationType.BetDeadlineReached, bet.Id.ToString(), p.appUserId), (DateTime) bet.Deadline);
+                    await _notificationService.MarkAsComplete(p.AppUserId, betId.ToString());
+                    await _notificationService.CreateNotification(NotificationType.BetInPlay, betId.ToString(), p.AppUserId);
+                    if (bet.Deadline.HasValue) BackgroundJob.Schedule(() => _notificationService.CreateNotification(NotificationType.BetDeadlineReached, bet.Id.ToString(), p.AppUserId), (DateTime)bet.Deadline);
                 }
 
                 await _betRepository.SaveAsync();
@@ -86,9 +111,6 @@ namespace PalBet.Services
 
 
             await _betRepository.SaveAsync();
-
-
-
 
 
             return true;
@@ -107,17 +129,17 @@ namespace PalBet.Services
                 throw new CustomException("Bet not found", "BET_NOTFOUND", 404);
 
             }
-            var betParticipant = bet.Participants.FirstOrDefault(b => b.appUserId == userId);
+            var betParticipant = bet.Participants.FirstOrDefault(b => b.AppUserId == userId);
             if (betParticipant == null)
             {
                 //There is no particpant with this id
-                throw new CustomException("User is not a participant in this bet", "BET_USER_NOTPARTICIPANT", 404);
+                throw new CustomException("User is not a participant in this Bet", "BET_USER_NOTPARTICIPANT", 404);
             }
             if (betParticipant.Accepted == true)
             {
 
                 //Already accepted
-                throw new CustomException("User has already accepted this bet", "BET_USER_ALREADYACCEPTED", 400);
+                throw new CustomException("User has already accepted this Bet", "BET_USER_ALREADYACCEPTED", 400);
             }
             if (bet.State != BetState.Requested)
             {
@@ -149,28 +171,61 @@ namespace PalBet.Services
                 var user = await _userManager.FindByNameAsync(username) ?? throw new CustomException($"User {username} not found", "BET_USER_NOTFOUND", 404);
                 participants.Add(new BetParticipant
                 {
-                    appUserId = user.Id,
-                    isBetHost = username == betHost,
-                    Accepted = username == betHost,
+                    AppUserId = user.Id,
+                    AppUser = user,
+                    IsBetHost = username == betHost,
+                    Accepted = false,
                 });
             }
-            participants = participants.DistinctBy(p => p.appUserId).ToList();
+            participants = participants.DistinctBy(p => p.AppUserId).ToList();
+
+            if (betDto.OutcomeChoice == OutcomeChoice.HostDefined && betDto.ChoicesText.Count < 2) throw new CustomException("At least two choices are required for host defined bets", "BET_INVALID_CHOICES", 400);
+
+            List<BetChoice> choices = new List<BetChoice>();
+
+            if (betDto.OutcomeChoice == OutcomeChoice.ParticipantAssigned)
+            {
+
+               foreach (var p in participants)
+                {
+                    var choice = new BetChoice { Text = p.AppUser.UserName + " wins"
+                    };
+
+                    choices.Add(choice);
+                    p.SelectedChoice = choice;
+
+                }
+
+            }
+            else if (betDto.OutcomeChoice == OutcomeChoice.HostDefined)
+            {
+                choices = betDto.ChoicesText.Select(c => new BetChoice { Text = c }).ToList();
+            }
+            if (betDto.OutcomeChoice == OutcomeChoice.UserSubmitted)
+            {
+                choices = new List<BetChoice>();
+            }
+
+
 
             Bet betModel = new Bet
             {
                 Participants = participants,
                 State = BetState.Requested,
-                BetType = BetType,
+                BetStakeType = BetType,
                 Coins = betDto.BetStakeCoins,
                 UserInput = betDto.BetStakeUserInput,
-                UserWinner = null,
                 BetDescription = betDto.BetDescription,
                 GroupId = betDto.GroupId,
                 Deadline = betDto.Deadline,
+                AllowMultipleWinners = betDto.AllowMultipleWinners,
+                OutcomeChoice = betDto.OutcomeChoice,
+                BurnStakeOnNoWnner = betDto.BurnStakeOnNoWinner,
 
+                Choices = choices
             };
 
-            
+
 
 
             //Check to see if all participants have enough coins.
@@ -181,7 +236,7 @@ namespace PalBet.Services
                 foreach (var p in betModel.Participants)
                 {
 
-                    if (await _userRepository.GetCoins(p.appUserId) < betModel.Coins) throw new CustomException($"User {p.appUserId} does not have enough coins", "BET_INSUFFICIENT_COINS", 400);
+                    if (await _userRepository.GetCoins(p.AppUserId) < betModel.Coins) throw new CustomException($"User {p.AppUserId} does not have enough coins", "BET_INSUFFICIENT_COINS", 400);
                 }
             }
 
@@ -191,7 +246,7 @@ namespace PalBet.Services
             var createdBet = await _betRepository.CreateBet(betModel);
             foreach (BetParticipant bp in createdBet.Participants)
             {
-                if (!bp.isBetHost) await _notificationService.CreateNotification(NotificationType.BetRequest, createdBet.Id.ToString(), bp.appUserId);
+                if (!bp.IsBetHost) await _notificationService.CreateNotification(NotificationType.BetRequest, createdBet.Id.ToString(), bp.AppUserId);
             }
 
             return createdBet;
@@ -216,46 +271,56 @@ namespace PalBet.Services
             return _betRepository.GetRequestedBets(userId);
         }
 
-        public async Task SetWinner(string winnerUserId, string updaterUserId, int betId)
+        public async Task DeclareWinner(string updaterUserId, int betId, int winningChoiceId)
         {
-            var bet = await _betRepository.GetByIdAsync(betId);
-
+            var bet = await _betRepository.GetByIdAsync(betId) ?? throw new CustomException("Bet not found", "BET_NOTFOUND", 404);
             //Check to see if the person updating it is the person who should be.
-            if (!bet.Participants.FirstOrDefault(p => p.appUserId == updaterUserId).isBetHost) throw new CustomException("Only the bet host can set the winner", "BET_SETWINNER_INVALIDUSER", 400);
-
-            //Check to see if the bet is still in play.
+            if (!bet.Participants.FirstOrDefault(p => p.AppUserId == updaterUserId).IsBetHost) throw new CustomException("Only the Bet host can set the winner", "BET_SETWINNER_INVALIDUSER", 400);
+            //Check to see if the Bet is still in play.
             if (bet.State != BetState.InPlay) throw new CustomException("Bet is not in play", "BET_SETWINNER_INVALIDSTATE", 400);
 
-            //Check to see if the winner id exists in the bet
-            if (!bet.Participants.Any(p => p.appUserId == winnerUserId)) throw new CustomException("Winner is not a participant in the bet", "BET_SETWINNER_INVALIDWINNER", 400);
+            var betWinners = bet.Participants.Where(p => p.SelectedChoiceId == winningChoiceId).ToList();
 
-            //Otherwise update the bet
             foreach (BetParticipant bp in bet.Participants)
             {
-                await _notificationService.MarkAsComplete(bp.appUserId, betId.ToString());
-                await _notificationService.CreateNotification(NotificationType.WinnerChosen, betId.ToString(), bp.appUserId);
+                await _notificationService.MarkAsComplete(bp.AppUserId, betId.ToString());
+                await _notificationService.CreateNotification(NotificationType.WinnerChosen, betId.ToString(), bp.AppUserId);
             }
 
-            bet.UserWinner = winnerUserId;
             bet.State = BetState.Completed;
 
+            
+
+            if (bet.BetStakeType == BetStakeType.UserInput) return;
+
+            if (betWinners.Count == 0 )
+            {
+                if (!bet.BurnStakeOnNoWnner)
+                {
+                    //Refund all players if no winner and not burning stakes
+                    bet.Participants.ToList().ForEach(async participants => await _userRepository.UpdateCoins(participants.AppUserId, (int) bet.Coins));
+                    return;
+                }
+                else return;
+            }
+
+            int winningAmount = (int)(bet.Coins * bet.Participants.Count * 0.95f);
+
+            if (bet.IsGroup)
+            {
+                var group = await _groupRepository.GetGroupAsync((int)bet.GroupId);
+                betWinners.ForEach(winner => group.UserGroups.FirstOrDefault(ug => ug.UserId == winner.AppUserId).CoinBalance += winningAmount);
+                await _groupRepository.SaveAsync();
+            }
+            else
+            {
+                betWinners.ForEach(async winner => {
+                    await _userRepository.UpdateCoins(winner.AppUserId, winningAmount);
+                    bet.Participants.FirstOrDefault(p => p.AppUserId == winner.AppUserId).IsWinner = true;
+                });
+            }
 
             await _betRepository.SaveAsync();
-
-            if (bet.BetType == BetStakeType.Coins)
-            {
-                if (bet.IsGroup)
-                {
-                    var group = await _groupRepository.GetGroupAsync((int)bet.GroupId);
-                    group.UserGroups.FirstOrDefault(ug => ug.UserId == winnerUserId).CoinBalance += (int)(bet.Coins * 0.95f);
-                    await _groupRepository.SaveAsync();
-                }
-                else
-                {
-                    await _userRepository.UpdateCoins(winnerUserId, betId);
-                }
-
-            }
 
         }
 
@@ -274,8 +339,8 @@ namespace PalBet.Services
 
             //Check to see if the person updating it is the person who should be.
 
-            if (!bet.Participants.FirstOrDefault(p => p.appUserId == userId).isBetHost) return false;
-            // Check to see if bet is in requeted state.
+            if (!bet.Participants.FirstOrDefault(p => p.AppUserId == userId).IsBetHost) return false;
+            // Check to see if Bet is in requeted state.
             if (bet.State != BetState.Requested) return false;
 
             bet.State = BetState.Cancelled;
@@ -289,7 +354,7 @@ namespace PalBet.Services
         {
 
             var bet = await _betRepository.GetByIdAsync(betId);
-            if (bet.Participants.Where(p => p.appUserId == userId).Any())
+            if (bet.Participants.Where(p => p.AppUserId == userId).Any())
             {
                 return bet.ToBetDtoFromBets(userId);
             }

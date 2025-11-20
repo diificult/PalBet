@@ -34,7 +34,7 @@ namespace PalBet.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Text")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -161,13 +161,13 @@ namespace PalBet.Migrations
                     b.Property<string>("LoginProvider")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Text")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("UserId", "LoginProvider", "Name");
+                    b.HasKey("UserId", "LoginProvider", "Text");
 
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
@@ -269,21 +269,21 @@ namespace PalBet.Migrations
 
             modelBuilder.Entity("PalBet.Models.BetParticipant", b =>
                 {
-                    b.Property<int>("betId")
+                    b.Property<int>("BetId")
                         .HasColumnType("int");
 
-                    b.Property<string>("appUserId")
+                    b.Property<string>("AppUserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("Accepted")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("isBetHost")
+                    b.Property<bool>("IsBetHost")
                         .HasColumnType("bit");
 
-                    b.HasKey("betId", "appUserId");
+                    b.HasKey("BetId", "AppUserId");
 
-                    b.HasIndex("appUserId");
+                    b.HasIndex("AppUserId");
 
                     b.ToTable("participants");
                 });
@@ -341,21 +341,21 @@ namespace PalBet.Migrations
 
             modelBuilder.Entity("PalBet.Models.BetParticipant", b =>
                 {
-                    b.HasOne("PalBet.Models.AppUser", "appUser")
+                    b.HasOne("PalBet.Models.AppUser", "AppUser")
                         .WithMany("BetsParticipation")
-                        .HasForeignKey("appUserId")
+                        .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PalBet.Models.Bet", "bet")
+                    b.HasOne("PalBet.Models.Bet", "Bet")
                         .WithMany("Participants")
-                        .HasForeignKey("betId")
+                        .HasForeignKey("BetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("appUser");
+                    b.Navigation("AppUser");
 
-                    b.Navigation("bet");
+                    b.Navigation("Bet");
                 });
 
             modelBuilder.Entity("PalBet.Models.AppUser", b =>

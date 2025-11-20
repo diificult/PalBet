@@ -10,15 +10,20 @@ namespace PalBet.Dtos.Bet
         public ICollection<string> ParticipantNames { set; get; }
         
         public string BetDescription { set; get; }
-        public string? UserWinner { set; get; }
+        public List<string>? UserWinner { set; get; }
 
         public string BetState { set; get; }
         public string BetStake { set; get; }
 
-        public bool isHost { set; get; } = false;
+        public bool IsHost { set; get; } = false;
 
         public string? Deadline { set; get; }
 
         public string? GroupName { set; get; }
+
+        public bool AllowMultipleWinners { get; set; } 
+        public OutcomeChoice OutcomeChoice { get; set; }
+        public bool BurnStakeOnNoWnner { get; set; }
+        public List<string>? Choices { get; set; }
     }
 }

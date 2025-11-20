@@ -248,12 +248,18 @@ namespace PalBet.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("AllowMultipleWinners")
+                        .HasColumnType("bit");
+
                     b.Property<string>("BetDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("BetType")
+                    b.Property<int>("BetStakeType")
                         .HasColumnType("int");
+
+                    b.Property<bool>("BurnStakeOnNoWnner")
+                        .HasColumnType("bit");
 
                     b.Property<int?>("Coins")
                         .HasColumnType("int");
@@ -264,13 +270,13 @@ namespace PalBet.Migrations
                     b.Property<int?>("GroupId")
                         .HasColumnType("int");
 
+                    b.Property<int>("OutcomeChoice")
+                        .HasColumnType("int");
+
                     b.Property<int>("State")
                         .HasColumnType("int");
 
                     b.Property<string>("UserInput")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserWinner")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -280,23 +286,53 @@ namespace PalBet.Migrations
                     b.ToTable("bets");
                 });
 
-            modelBuilder.Entity("PalBet.Models.BetParticipant", b =>
+            modelBuilder.Entity("PalBet.Models.BetChoice", b =>
                 {
-                    b.Property<int>("betId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<string>("appUserId")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BetId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BetId");
+
+                    b.ToTable("BetChoice");
+                });
+
+            modelBuilder.Entity("PalBet.Models.BetParticipant", b =>
+                {
+                    b.Property<int>("BetId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AppUserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("Accepted")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("isBetHost")
+                    b.Property<bool>("IsBetHost")
                         .HasColumnType("bit");
 
-                    b.HasKey("betId", "appUserId");
+                    b.Property<bool>("IsWinner")
+                        .HasColumnType("bit");
 
-                    b.HasIndex("appUserId");
+                    b.Property<int?>("SelectedChoiceId")
+                        .HasColumnType("int");
+
+                    b.HasKey("BetId", "AppUserId");
+
+                    b.HasIndex("AppUserId");
+
+                    b.HasIndex("SelectedChoiceId");
 
                     b.ToTable("participants");
                 });
@@ -461,23 +497,40 @@ namespace PalBet.Migrations
                     b.Navigation("Group");
                 });
 
+            modelBuilder.Entity("PalBet.Models.BetChoice", b =>
+                {
+                    b.HasOne("PalBet.Models.Bet", "Bet")
+                        .WithMany("Choices")
+                        .HasForeignKey("BetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bet");
+                });
+
             modelBuilder.Entity("PalBet.Models.BetParticipant", b =>
                 {
-                    b.HasOne("PalBet.Models.AppUser", "appUser")
+                    b.HasOne("PalBet.Models.AppUser", "AppUser")
                         .WithMany("BetsParticipation")
-                        .HasForeignKey("appUserId")
+                        .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PalBet.Models.Bet", "bet")
+                    b.HasOne("PalBet.Models.Bet", "Bet")
                         .WithMany("Participants")
-                        .HasForeignKey("betId")
+                        .HasForeignKey("BetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("appUser");
+                    b.HasOne("PalBet.Models.BetChoice", "SelectedChoice")
+                        .WithMany()
+                        .HasForeignKey("SelectedChoiceId");
 
-                    b.Navigation("bet");
+                    b.Navigation("AppUser");
+
+                    b.Navigation("Bet");
+
+                    b.Navigation("SelectedChoice");
                 });
 
             modelBuilder.Entity("PalBet.Models.Friendship", b =>
@@ -542,6 +595,8 @@ namespace PalBet.Migrations
 
             modelBuilder.Entity("PalBet.Models.Bet", b =>
                 {
+                    b.Navigation("Choices");
+
                     b.Navigation("Participants");
                 });
 

@@ -16,6 +16,8 @@ export default function BetList({ bets, mode }) {
                             isHost={bet.isHost}
                             state={bet.betState}
                             groupName={bet.groupName}
+                            outcomeChoice={bet.outcomeChoice}
+                            choices={bet.choices}
                         />
                     </li>
                 ))}

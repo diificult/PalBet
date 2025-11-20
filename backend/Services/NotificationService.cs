@@ -65,8 +65,8 @@ namespace PalBet.Services
                         break;
                     case (NotificationType.WinnerChosen):
                         var bet2 = await _betRepository.GetByIdAsync(int.Parse(notification.EntityId));
-                        var winner = await _userManager.FindByIdAsync(bet2.UserWinner);
-                        notificationDtos.Add(notification.fromNotifcationToBetWinnerNotificationDto(bet2, winner.UserName));
+                        //var winner = await _userManager.FindByIdAsync(bet2.UserWinner);
+                        notificationDtos.Add(notification.fromNotifcationToBetWinnerNotificationDto(bet2, null));
                         break;
                     case (NotificationType.BetDeadlineReached):
                         var bet3 = await _betRepository.GetByIdAsync(int.Parse(notification.EntityId));

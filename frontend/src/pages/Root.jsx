@@ -3,7 +3,7 @@ import SideDraw from "../components/SideDraw";
 import { useEffect } from "react";
 import { getTokenDuration } from "../util/auth";
 import { ChooseWinnerContextProvider } from "../store/ChooseWinnerContext";
-import ChooseWinner from "../components/ChooseWinner";
+import { OutcomeChoiceContextProvider } from "../store/OutcomeChoiceContext";
 import { UserPermissionsContextProvider } from "../store/UserPermissionsContext";
 
 function RootLayout() {
@@ -28,14 +28,16 @@ function RootLayout() {
     return (
         <>
             <ChooseWinnerContextProvider>
-                <UserPermissionsContextProvider>
-            <div className="min-h-screen flex w-full items-start"> 
-                <SideDraw /> 
-                <main className="flex-1 min-h-screen p-6 max-w-full">
-                    <Outlet />
-                </main>
-            </div>
-            </UserPermissionsContextProvider>
+                <OutcomeChoiceContextProvider>
+                    <UserPermissionsContextProvider>
+                        <div className="min-h-screen flex w-full items-start">
+                            <SideDraw />
+                            <main className="flex-1 min-h-screen p-6 max-w-full">
+                                <Outlet />
+                            </main>
+                        </div>
+                    </UserPermissionsContextProvider>
+                </OutcomeChoiceContextProvider>
             </ChooseWinnerContextProvider>
         </>
     );

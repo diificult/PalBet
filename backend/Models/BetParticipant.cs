@@ -1,13 +1,20 @@
-﻿namespace PalBet.Models
+﻿using Microsoft.Identity.Client;
+
+namespace PalBet.Models
 {
     public class BetParticipant
     {
-        public string appUserId { get; set; }
-        public AppUser appUser { get; set; }
-        public int betId { get; set; }
-        public Bet bet { get; set;  }
+        public string AppUserId { get; set; }
+        public AppUser AppUser { get; set; }
+        public int BetId { get; set; }
+        public Bet Bet { get; set;  }
 
         public bool Accepted { get; set; }
-        public bool isBetHost { get; set; }
+        public bool IsBetHost { get; set; }
+
+        public bool IsWinner { get; set; } = false;
+
+        public int? SelectedChoiceId { get; set; }
+        public BetChoice? SelectedChoice { get; set; }
     }
 }

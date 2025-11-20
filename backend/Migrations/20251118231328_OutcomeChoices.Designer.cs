@@ -12,8 +12,8 @@ using PalBet.Data;
 namespace PalBet.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251024153656_Deadline")]
-    partial class Deadline
+    [Migration("20251118231328_OutcomeChoices")]
+    partial class OutcomeChoices
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,7 +34,7 @@ namespace PalBet.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Text")
+                    b.Property<string>("Name")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -161,13 +161,13 @@ namespace PalBet.Migrations
                     b.Property<string>("LoginProvider")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Text")
+                    b.Property<string>("Name")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("UserId", "LoginProvider", "Text");
+                    b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
@@ -183,6 +183,9 @@ namespace PalBet.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DailyRewardLastClaim")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -248,6 +251,9 @@ namespace PalBet.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("AllowMultipleWinners")
+                        .HasColumnType("bit");
+
                     b.Property<string>("BetDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -255,11 +261,20 @@ namespace PalBet.Migrations
                     b.Property<int>("BetStakeType")
                         .HasColumnType("int");
 
+                    b.Property<bool>("BurnStakeOnNoWnner")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("Coins")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("Deadline")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OutcomeChoice")
+                        .HasColumnType("int");
 
                     b.Property<int>("State")
                         .HasColumnType("int");
@@ -267,12 +282,33 @@ namespace PalBet.Migrations
                     b.Property<string>("UserInput")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserWinner")
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.ToTable("bets");
+                });
+
+            modelBuilder.Entity("PalBet.Models.BetChoice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BetId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("bets");
+                    b.HasIndex("BetId");
+
+                    b.ToTable("BetChoice");
                 });
 
             modelBuilder.Entity("PalBet.Models.BetParticipant", b =>
@@ -289,9 +325,17 @@ namespace PalBet.Migrations
                     b.Property<bool>("IsBetHost")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsWinner")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("SelectedChoiceId")
+                        .HasColumnType("int");
+
                     b.HasKey("BetId", "AppUserId");
 
                     b.HasIndex("AppUserId");
+
+                    b.HasIndex("SelectedChoiceId");
 
                     b.ToTable("participants");
                 });
@@ -315,6 +359,26 @@ namespace PalBet.Migrations
                     b.HasIndex("RequesteeId");
 
                     b.ToTable("friendships");
+                });
+
+            modelBuilder.Entity("PalBet.Models.Group", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DefaultCoinBalance")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Groups");
                 });
 
             modelBuilder.Entity("PalBet.Models.Notification", b =>
@@ -350,6 +414,30 @@ namespace PalBet.Migrations
                     b.HasIndex("NotifyeeId");
 
                     b.ToTable("notification");
+                });
+
+            modelBuilder.Entity("PalBet.Models.UserGroup", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("CanCreateBet")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("CoinBalance")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("bit");
+
+                    b.HasKey("UserId", "GroupId");
+
+                    b.HasIndex("GroupId");
+
+                    b.ToTable("UserGroup");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -403,6 +491,26 @@ namespace PalBet.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("PalBet.Models.Bet", b =>
+                {
+                    b.HasOne("PalBet.Models.Group", "Group")
+                        .WithMany("GroupBets")
+                        .HasForeignKey("GroupId");
+
+                    b.Navigation("Group");
+                });
+
+            modelBuilder.Entity("PalBet.Models.BetChoice", b =>
+                {
+                    b.HasOne("PalBet.Models.Bet", "Bet")
+                        .WithMany("Choices")
+                        .HasForeignKey("BetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bet");
+                });
+
             modelBuilder.Entity("PalBet.Models.BetParticipant", b =>
                 {
                     b.HasOne("PalBet.Models.AppUser", "AppUser")
@@ -417,9 +525,15 @@ namespace PalBet.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("PalBet.Models.BetChoice", "SelectedChoice")
+                        .WithMany()
+                        .HasForeignKey("SelectedChoiceId");
+
                     b.Navigation("AppUser");
 
                     b.Navigation("Bet");
+
+                    b.Navigation("SelectedChoice");
                 });
 
             modelBuilder.Entity("PalBet.Models.Friendship", b =>
@@ -452,9 +566,30 @@ namespace PalBet.Migrations
                     b.Navigation("Notifyee");
                 });
 
+            modelBuilder.Entity("PalBet.Models.UserGroup", b =>
+                {
+                    b.HasOne("PalBet.Models.Group", "Group")
+                        .WithMany("UserGroups")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PalBet.Models.AppUser", "User")
+                        .WithMany("UserGroups")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("PalBet.Models.AppUser", b =>
                 {
                     b.Navigation("BetsParticipation");
+
+                    b.Navigation("UserGroups");
 
                     b.Navigation("friendshipsInstantiated");
 
@@ -463,7 +598,16 @@ namespace PalBet.Migrations
 
             modelBuilder.Entity("PalBet.Models.Bet", b =>
                 {
+                    b.Navigation("Choices");
+
                     b.Navigation("Participants");
+                });
+
+            modelBuilder.Entity("PalBet.Models.Group", b =>
+                {
+                    b.Navigation("GroupBets");
+
+                    b.Navigation("UserGroups");
                 });
 #pragma warning restore 612, 618
         }

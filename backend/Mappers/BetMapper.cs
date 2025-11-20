@@ -15,24 +15,33 @@ namespace PalBet.Mappers
             {
                 BetDescription = dto.BetDescription,
                 Deadline = dto.Deadline,
+                GroupId = dto.GroupId,
+                AllowMultipleWinners = dto.AllowMultipleWinners,
+                BurnStakeOnNoWnner = dto.BurnStakeOnNoWinner,
+                BetStakeType = dto.BetStakeUserInput != null ? BetStakeType.UserInput : BetStakeType.Coins,
             };
         }
 
             
         public static BetDto ToBetDtoFromBets(this Bet bet, string userId)
         {
-
             return new BetDto
             {
                 BetId = bet.Id,
-                ParticipantNames = bet.Participants?.Select(b => b.appUser?.UserName).ToList(),
+                ParticipantNames = bet.Participants?.Select(b => b.AppUser?.UserName).ToList(),
                 BetDescription = bet.BetDescription,
-                UserWinner = bet.UserWinner,
+                UserWinner = bet.Participants.Where(p => p.IsWinner == true).Select(p => p.AppUser.UserName).ToList(),
                 BetState = bet.State.ToString(),
-                BetStake = bet.BetType == BetStakeType.UserInput ? bet.UserInput : bet.Coins.ToString() + " Coins",
-                isHost = bet.Participants.Last().appUserId == userId,
+                BetStake = bet.BetStakeType == BetStakeType.UserInput ? bet.UserInput : bet.Coins.ToString() + " Coins",
+                IsHost = bet.Participants.Last().AppUserId == userId,
                 Deadline = bet.Deadline?.ToString("dd/MM/yy HH:mm"),
                 GroupName = bet.Group?.Name,
+                AllowMultipleWinners = bet.AllowMultipleWinners,
+                BurnStakeOnNoWnner = bet.BurnStakeOnNoWnner,
+                OutcomeChoice = bet.OutcomeChoice,
+                Choices = bet.Choices?.Select(c => c.Text).ToList(),
+
+
 
             };
         }

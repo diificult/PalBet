@@ -2,7 +2,7 @@
 {
     public class ChooseWinnerDto
     {
-        public int betId { get; set; }
-        public string winnerUsername { get; set; }
+        public int BetId { get; set; }
+        public List<string> WinnerUsernames { get; set; }
     }
 }

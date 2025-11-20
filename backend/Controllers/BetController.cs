@@ -19,10 +19,10 @@ namespace PalBet.Controllers
         public readonly UserManager<AppUser> _userManager;
         private readonly IBetService _betService;
 
-        public BetController(IBetService bs, UserManager<AppUser> um)
+        public BetController(IBetService betService, UserManager<AppUser> userManager)
         {
-            _betService = bs;
-            _userManager = um;
+            _betService = betService;
+            _userManager = userManager;
         }
         
         [HttpPost("CreateBet")]
@@ -49,14 +49,14 @@ namespace PalBet.Controllers
             return Ok(bets);
         }
 
-        [HttpPut("AcceptBet")]
+        [HttpPut("{BetId}/AcceptBet")]
         [Authorize]
-        public async Task<IActionResult> AcceptBet([FromBody]int betId)
+        public async Task<IActionResult> AcceptBet([FromRoute] int betId, [FromBody] string? choice)
         {
             var Username = User.GetUsername();
             var AppUser = await _userManager.FindByNameAsync(Username);
 
-            var Accepted = await _betService.AcceptBet(AppUser.Id, betId);
+            var Accepted = await _betService.AcceptBet(AppUser.Id, betId, choice);
 
             if (Accepted) return Ok();
             return NotFound();
@@ -75,19 +75,16 @@ namespace PalBet.Controllers
             return NotFound();
         }
 
-        [HttpPut("ChooseWinner")]
-        [Authorize]
 
-        public async Task<IActionResult> ChooseWinner([FromBody] ChooseWinnerDto dto)
+
+        [HttpPut("{BetId}/DeclareWinner")]
+        [Authorize]
+        public async Task<IActionResult> DeclareWinner([FromRoute] int BetId, [FromBody] int ChoiceId)
         {
             var Username = User.GetUsername();
             var AppUser = await _userManager.FindByNameAsync(Username);
-            var winnerUserId = await _userManager.FindByNameAsync(dto.winnerUsername);
-
-            await _betService.SetWinner(winnerUserId.Id, AppUser.Id, dto.betId);
-
-           return Ok();
-           
+            await _betService.DeclareWinner(AppUser.Id, BetId, ChoiceId);
+            return Ok();
         }
 
         [HttpGet("GetBetFromState")]
@@ -101,7 +98,7 @@ namespace PalBet.Controllers
             return Ok(bets);
         }
 
-        [HttpGet("GetBetFromId/{betId}")]
+        [HttpGet("GetBetFromId/{BetId}")]
         [Authorize]
         public async Task<IActionResult> GetBetFromId([FromRoute] int betId)
         {

@@ -188,8 +188,7 @@ Once on bets page, you can click on create new bet to create a new bet. Fill in 
 
 ### 0.4 - Improved options for predictions & design
 
--   [ ] Better options for host of predictions, perhaps a draw or failed option, one sided.
--   [ ] Better friend search.
+-   [x] Better options for host of predictions, perhaps a draw or failed option, one sided.
 -   [x] Create notification when end date reached for a bet - Using hangfire.
 -   [ ] Improve page layout and design.
 

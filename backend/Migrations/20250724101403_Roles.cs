@@ -14,7 +14,7 @@ namespace PalBet.Migrations
         {
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                columns: new[] { "Id", "ConcurrencyStamp", "Text", "NormalizedName" },
                 values: new object[,]
                 {
                     { "1", null, "Admin", "ADMIN" },

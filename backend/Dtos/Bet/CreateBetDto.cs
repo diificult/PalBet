@@ -19,6 +19,12 @@ namespace PalBet.Dtos.Bet
 
         public int? GroupId { get; set; }
 
+        public bool AllowMultipleWinners { get; set; }
+        public bool BurnStakeOnNoWinner { get; set; }
+
+        public List<string>? ChoicesText { get; set; }
+
+        public OutcomeChoice OutcomeChoice { get; set; }
 
 
     }

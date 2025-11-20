@@ -10,6 +10,8 @@ import { getAuthToken } from "../util/auth";
 import { Suspense } from "react";
 import BetList from "../components/BetList";
 import ChooseWinner from "../components/ChooseWinner";
+import HostDefinedChoices from "../components/HostDefinedChoices";
+import UserDefinedChoices from "../components/UserDefinedChoices";
 
 export default function BetsPage() {
     const { betRequests, betRequested, openBets, completedBets } =
@@ -17,6 +19,8 @@ export default function BetsPage() {
     return (
         <>
             <ChooseWinner />
+            <HostDefinedChoices />
+            <UserDefinedChoices />
 
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-semibold">Bets</h1>
@@ -177,8 +181,13 @@ export async function action({ request }) {
     const formData = await request.formData();
     const actionType = formData.get("action");
     let data = formData.get("betId");
+    
     let endpoint = "";
-    if (actionType === "accept") endpoint = "/Bet/AcceptBet";
+    if (actionType === "accept") {
+        endpoint = `/Bet/${data}/AcceptBet`;
+        const outcomeChoice = formData.get("outcomeChoice");
+        data = outcomeChoice;
+    }
     if (actionType === "cancel") endpoint = "/Bet/CancelBet";
     if (actionType === "winner") {
         endpoint = "/Bet/ChooseWinner";

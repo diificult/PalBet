@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { Link, useSubmit } from "react-router-dom";
 import ChooseWinnerContext from "../store/ChooseWinnerContext";
+import OutcomeChoiceContext from "../store/OutcomeChoiceContext";
 import TollIcon from '@mui/icons-material/Toll';
 import { Bolt, CalendarToday, Group, People, Toll } from "@mui/icons-material";
 
@@ -23,6 +24,7 @@ function isDeadlinePassed(deadlineString) {
     
     return new Date() > deadline;
 }
+
 export default function BetListItem({
     id,
     title,
@@ -32,23 +34,32 @@ export default function BetListItem({
     mode,
     isHost,
     state,
-    groupName
+    groupName,
+    outcomeChoice,
+    choices
 }) {
     const submit = useSubmit();
     const modelCtx = useContext(ChooseWinnerContext);
+    const outcomeChoiceCtx = useContext(OutcomeChoiceContext);
 
     function handleAction(actionType, method) {
-        console.log(id);
-        submit(
-            { betId: id, action: actionType },
-            {
-                method: method,
-            }
-        );
+        if (outcomeChoice === 2) {
+            submit(
+                { betId: id, action: actionType },
+                {
+                    method: method,
+                }
+            );
+        } else if (outcomeChoice === 0) {
+            // Host defined choices
+            outcomeChoiceCtx.showModal({ choices: choices, id }, "hostDefinedChoices");
+        } else if (outcomeChoice === 1) {
+            // User defined choices
+            outcomeChoiceCtx.showModal({ id }, "userDefinedChoices");
+        }
     }
 
     function handleShowModal() {
-        console.log("Should be showing");
         modelCtx.showModel({ participants, id });
     }
 

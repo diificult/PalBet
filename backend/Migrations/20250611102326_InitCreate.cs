@@ -240,7 +240,7 @@ namespace PalBet.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_participants_appUserId",
                 table: "participants",
-                column: "appUserId");
+                column: "AppUserId");
         }
 
         /// <inheritdoc />
