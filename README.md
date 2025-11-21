@@ -179,12 +179,12 @@ Once on bets page, you can click on create new bet to create a new bet. Fill in 
 -   [x] Group leader can edit settings such as coins for the group.
 -   [x] Create a page for viewing groups and group information.
 -   [x] Group leader can add and remove players.
--   [ ] Group leader can adjust permissions of users.
+-   [x] Group leader can adjust permissions of users.
 
 ### 0.3 - Daily Rewards
 
--   [ ] Create daily rewards for the user so they can continue to create coins.
--   [ ] Create a method to remove coins from the economy to attempt to mitigate inflation risks.
+-   [x] Create daily rewards for the user so they can continue to create coins.
+-   [x] Create a method to remove coins from the economy to attempt to mitigate inflation risks.
 
 ### 0.4 - Improved options for predictions & design
 

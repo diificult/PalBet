@@ -1,4 +1,4 @@
-import { Button, Input, ToggleButton, ToggleButtonGroup } from "@mui/material";
+// MUI removed except icons. Use native elements and Tailwind for layout.
 import {
     Await,
     Form,
@@ -13,15 +13,14 @@ import { Suspense, useState } from "react";
 import { sendHttpRequest } from "../hooks/useHttp";
 import { getAuthToken } from "../util/auth";
 
-export default function CreateBetRequestForm({ method, mode = 'friends', groupId = null }) {
+
+export default function CreateBetRequestForm({ method }) {
     const { participants } = useLoaderData();
-    const [selectedParticipants, setSelectedParticipants] = useState(() => []);
+    const [selectedParticipants, setSelectedParticipants] = useState([]);
     const [selectedMode, setSelectedMode] = useState("coins");
     const [selectedOutcomeType, setSelectedOutcomeType] = useState("ParticipantAssigned");
-
-    const handleParticipants = (event, newFormats) => {
-        setSelectedParticipants(newFormats);
-    };
+    const [numChoices, setNumChoices] = useState(2);
+    const [hostChoices, setHostChoices] = useState(["", ""]);
 
     const navigation = useNavigation();
     const isSubmitting = navigation.state === "submitting";
@@ -48,153 +47,183 @@ export default function CreateBetRequestForm({ method, mode = 'friends', groupId
     */
 
 
-    const [numChoices, setNumChoices] = useState(2);
-
     return (
-        <>
-            <Form method={method} className="flex flex-col items-start m-10">
-                <div className="font-extrabold p-10 m-5">
-                    <label className="font-extrabold">Bet Description</label>
-                    <Input
-                        id="desc"
-                        type="text"
-                        name="desc"
-                        required
-                        variant="outline"
-                        className="w-96 h-10 p-2 m-4 "
-                    ></Input>
-                </div>
-                <div className="font-extrabold p-10 m-5">
-                    <label className="font-extrabold">Bet Type</label>
-                    <select
-                        name="betType"
-                        value={selectedMode}
-                        onChange={(e) => setSelectedMode(e.target.value)}
-                    >
-                        <option value="coin">Coins</option>
-                        <option value="input">User Input</option>
-                    </select>
-                    <label className="font-extrabold">Bet Value</label>
-                    <Input
-                        id="bet"
-                        type={selectedMode == "coin" ? "number" : "text"}
-                        name="bet"
-                        variant="outline"
-                        required
-                        className="w-64 h-10 p-2 m-4 "
-                    ></Input>
-                </div>
-
-                <div className="font-extrabold p-10 m-5">
-                    <label className="font-extrabold">Deadline? (optional) </label>
-                    <Input
-                        id="deadline"
-                        name="deadline"
-                        type="datetime-local"
-                        min={formattedNow}
-                    ></Input>
-                </div>
+        <form method={method} className="space-y-8 p-6 w-full max-w-xl bg-white rounded shadow mx-auto">
+            <div>
+                <label htmlFor="desc" className="block font-semibold mb-2">Bet Description</label>
                 <input
-                    type="hidden"
-                    name="friends"
-                    value={JSON.stringify(selectedParticipants)}
+                    id="desc"
+                    type="text"
+                    name="desc"
+                    required
+                    className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <div className="font-extrabold p-10 m-5 flex">
-                    <div className="font-extrabold p-10 m-5">
-                        <label className="font-extrabold">Settings:</label>    
-                        <select name="BetMode" className="m-4" onChange={(e) => setSelectedOutcomeType(e.target.value)} >
-                            <option value="ParticipantAssigned">Default Options ("x" player wins)</option>
-                            <option value="HostDefined">Host Defined Choices</option>
-                            <option value="UserSubmitted">User Submitted Choices</option>
-                        </select>
-                        <input type="checkbox" name="AllowMultipleWinners" /> Allow Multiple Winners
-                        <input type="checkbox" name="BurnStakeOnNoWnner" defaultChecked={true} /> Burn Stake On No Winner
-                    </div>
-                </div>
-
-                {selectedOutcomeType === "HostDefined" && (
-                    <div className="font-extrabold p-10 m-5">
-                        <label className="font-extrabold">Number of Choices (1-32):</label>
-                        <Input
-                            type="number"
-                            min="1"
-                            max="32"
-                            value={numChoices}
-                            onChange={(e) => setNumChoices(Math.min(32, Math.max(1, parseInt(e.target.value) || 1)))}
-                            className="w-20 h-10 p-2 m-4"
-                        />
-                        <div className="font-extrabold p-10 m-5">
-                            <label className="font-extrabold">Input Choices:</label>
-                            {Array.from({ length: numChoices }, (_, i) => (
-                                <Input
-                                    key={`choice_${i}`}
-                                    id={`choice_${i}`}
-                                    type="text"
-                                    name={`choice_${i}`}
-                                    placeholder={`Choice ${i + 1}`}
-                                    variant="outline"
-                                    required
-                                    className="w-96 h-10 p-2 m-4"
-                                />
-                            ))}
-                        </div>
-                    </div>
-                )}
-                    
-                <div className="font-extrabold p-10 m-5">
-                    <label className="font-extrabold">Select Participants(s)</label>
-                    <Suspense
-                        fallback={
-                            <p style={{ textAlign: "center" }}>Loading...</p>
-                        }
-                    >
-                        <Await resolve={participants}>
-                            {(loadedFriends) => (
-                                <>
-                                    {loadedFriends.length === 0 && (
-                                        <p>
-                                            You currently have no friends added.
-                                            <Link to="/friends">
-                                                Click here
-                                            </Link>
-                                            to add some!
-                                        </p>
-                                    )}
-
-                                    <ToggleButtonGroup
-                                        value={selectedParticipants}
-                                        onChange={handleParticipants}
-                                        fullWidth
-                                    >
-                                        {loadedFriends.map((friend) => (
-                                            <ToggleButton
-                                                value={friend.username}
-                                                key={friend.username}
-                                            >
-                                                <UserItem
-                                                    friend={friend}
-                                                    mode="selector"
-                                                />
-                                            </ToggleButton>
-                                        ))}
-                                    </ToggleButtonGroup>
-                                </>
-                            )}
-                        </Await>
-                    </Suspense>
-                </div>
-                <Button
-                    variant="contained"
-                    type="submit"
-                    disabled={isSubmitting}
+            </div>
+            <div>
+                <label className="block font-semibold mb-2">Bet Type</label>
+                <select
+                    name="betType"
+                    value={selectedMode}
+                    onChange={e => setSelectedMode(e.target.value)}
+                    className="w-full border border-gray-300 rounded px-3 py-2 mb-2"
                 >
-                    Submit
-                </Button>
-            </Form>
-        </>
+                    <option value="coin">Coins</option>
+                    <option value="input">User Input</option>
+                </select>
+                <label htmlFor="bet" className="block font-semibold mb-2">Bet Value</label>
+                <input
+                    id="bet"
+                    type={selectedMode === "coin" ? "number" : "text"}
+                    name="bet"
+                    required
+                    className="w-full border border-gray-300 rounded px-3 py-2"
+                />
+            </div>
+            <div>
+                <label htmlFor="deadline" className="block font-semibold mb-2">Deadline? (optional)</label>
+                <input
+                    id="deadline"
+                    name="deadline"
+                    type="datetime-local"
+                    min={formattedNow}
+                    className="w-full border border-gray-300 rounded px-3 py-2"
+                />
+            </div>
+            <input
+                type="hidden"
+                name="friends"
+                value={JSON.stringify(selectedParticipants)}
+            />
+            <div>
+                <label className="block font-semibold mb-2">Settings</label>
+                <select
+                    name="BetMode"
+                    className="w-full border border-gray-300 rounded px-3 py-2 mb-2"
+                    value={selectedOutcomeType}
+                    onChange={e => {
+                        setSelectedOutcomeType(e.target.value);
+                        if (e.target.value === "HostDefined") {
+                            setNumChoices(2);
+                            setHostChoices(["", ""]);
+                        }
+                    }}
+                >
+                    <option value="ParticipantAssigned">Default Options ("x" player wins)</option>
+                    <option value="HostDefined">Host Defined Choices</option>
+                    <option value="UserSubmitted">User Submitted Choices</option>
+                </select>
+                <div className="flex items-center gap-4 mt-2">
+                    <label className="inline-flex items-center">
+                        <input type="checkbox" name="AllowMultipleWinners" className="accent-blue-600" />
+                        <span className="ml-2">Allow Multiple Winners</span>
+                    </label>
+                    <label className="inline-flex items-center">
+                        <input type="checkbox" name="BurnStakeOnNoWnner" defaultChecked={true} className="accent-blue-600" />
+                        <span className="ml-2">Burn Stake On No Winner</span>
+                    </label>
+                </div>
+            </div>
+            {selectedOutcomeType === "HostDefined" && (
+                <div className="border rounded p-4 bg-gray-50">
+                    <label className="block font-semibold mb-2">Number of Choices (2-32):</label>
+                    <input
+                        type="number"
+                        min="2"
+                        max="32"
+                        value={numChoices}
+                        onChange={e => {
+                            const val = Math.max(2, Math.min(32, parseInt(e.target.value) || 2));
+                            setNumChoices(val);
+                            setHostChoices(arr => {
+                                const next = arr.slice(0, val);
+                                while (next.length < val) next.push("");
+                                return next;
+                            });
+                        }}
+                        className="w-20 border border-gray-300 rounded px-2 py-1 mb-2"
+                    />
+                    <div className="space-y-2 mt-2">
+                        <label className="block font-semibold mb-1">Input Choices:</label>
+                        {Array.from({ length: numChoices }, (_, i) => (
+                            <input
+                                key={`choice_${i}`}
+                                id={`choice_${i}`}
+                                type="text"
+                                name={`choice_${i}`}
+                                placeholder={`Choice ${i + 1}`}
+                                required
+                                value={hostChoices[i] || ""}
+                                onChange={e => {
+                                    setHostChoices(arr => {
+                                        const next = arr.slice();
+                                        next[i] = e.target.value;
+                                        return next;
+                                    });
+                                }}
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                            />
+                        ))}
+                    </div>
+                </div>
+            )}
+            <div>
+                <label className="block font-semibold mb-2">Select Participants(s)</label>
+                <Suspense fallback={<p className="text-center">Loading...</p>}>
+                    <Await resolve={participants}>
+                        {(loadedFriends) => (
+                            <>
+                                {loadedFriends.length === 0 && (
+                                    <p>
+                                        You currently have no friends added.{' '}
+                                        <Link to="/friends" className="text-blue-600 underline">Click here</Link> to add some!
+                                    </p>
+                                )}
+                                <div className="flex flex-wrap gap-2">
+                                    {loadedFriends.map((friend) => (
+                                        <label key={friend.username} className={`flex items-center border rounded px-3 py-2 cursor-pointer transition ${selectedParticipants.includes(friend.username) ? 'bg-blue-100 border-blue-400' : 'bg-white border-gray-300'}`}>
+                                            <input
+                                                type="checkbox"
+                                                className="mr-2 accent-blue-600"
+                                                checked={selectedParticipants.includes(friend.username)}
+                                                onChange={e => {
+                                                    if (e.target.checked) {
+                                                        setSelectedParticipants([...selectedParticipants, friend.username]);
+                                                    } else {
+                                                        setSelectedParticipants(selectedParticipants.filter(f => f !== friend.username));
+                                                    }
+                                                }}
+                                            />
+                                            <UserItem friend={friend} mode="selector" />
+                                        </label>
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                    </Await>
+                </Suspense>
+            </div>
+            <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-2 px-4 bg-blue-600 text-white rounded font-semibold hover:bg-blue-700 transition"
+            >
+                {isSubmitting ? 'Submitting...' : 'Create Bet'}
+            </button>
+        </form>
     );
 }
 
+
+export async function loader({ params }) {
+    const groupId = params.groupId;
+    let participants;
+    if (groupId) {
+        participants = await loadGroupMembers(groupId);
+    } else {
+        participants = await loadFriends();
+    }
+    return { participants };
+}
 async function loadFriends() {
     const response = await sendHttpRequest("/friend/GetFriendsList", {
         method: "GET",
@@ -211,23 +240,7 @@ async function loadFriends() {
             }
         );
     }
-
-    const resData = await response.json();
-    return resData;
-}
-
-export async function loader({ params }) {
-    const groupId = params.groupId;
-    
-    if (groupId) {
-        return {
-            participants: loadGroupMembers(groupId),
-        };
-    }
-    
-    return {
-        participants: loadFriends(),
-    };
+    return response.json();
 }
 
 async function loadGroupMembers(groupId) {

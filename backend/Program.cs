@@ -160,6 +160,8 @@ app.UseHangfireDashboard();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.UseCors("AllowFrontend");

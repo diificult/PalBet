@@ -83,16 +83,20 @@ namespace PalBet.Services
                 //Remove coins for each player
                 if (bet.BetStakeType == BetStakeType.Coins)
                 {
+
                     foreach (BetParticipant p in bet.Participants)
                     {
-                        var user = await _userRepository.GetUserAsync(p.AppUserId);
-                        var updatedCoins = user.PersonalCoins - bet.Coins;
-                        if (updatedCoins < 0)
-                        {
-                            throw new CustomException($"User {user.UserName} does not have enough coins to accept the Bet", "BET_INSUFFICIENT_COINS", 400);
-                        }
+                        var current = await _userRepository.GetCoins(p.AppUserId);
+                        if (current < bet.Coins)
+                            throw new CustomException($"User {p.AppUser.UserName} does not have enough coins to accept the Bet", "BET_INSUFFICIENT_COINS", 400);
 
                     }
+
+                    foreach (BetParticipant p in bet.Participants)
+                    {
+                        await _userRepository.UpdateCoins(p.AppUserId, -(int)bet.Coins);
+                    }
+
                     await _userRepository.SaveAsync();
 
                 }

@@ -69,7 +69,6 @@ namespace PalBet.Controllers
             {
                 return BadRequest(ModelState);
             }
-            Console.WriteLine($"Username: {dto.Username}, Password: {dto.Password}");
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == dto.Username.ToLower());
             if (user == null) return Unauthorized("Invalid Username");
 
