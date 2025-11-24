@@ -48,7 +48,7 @@ export default function CreateBetRequestForm({ method }) {
 
 
     return (
-        <form method={method} className="space-y-8 p-6 w-full max-w-xl bg-white rounded shadow mx-auto">
+        <Form method={method} className="space-y-8 p-6 w-full max-w-xl bg-white rounded shadow mx-auto">
             <div>
                 <label htmlFor="desc" className="block font-semibold mb-2">Bet Description</label>
                 <input
@@ -209,7 +209,7 @@ export default function CreateBetRequestForm({ method }) {
             >
                 {isSubmitting ? 'Submitting...' : 'Create Bet'}
             </button>
-        </form>
+        </Form>
     );
 }
 
@@ -265,6 +265,7 @@ async function loadGroupMembers(groupId) {
 }
 
 export async function action({ request, params }) {
+    console.log("creating bets");
     const groupId = params.groupId;
     const formData = await request.formData();
     let betModel = {
@@ -309,6 +310,7 @@ export async function action({ request, params }) {
     } else {
         betModel = { ...betModel, BurnStakeOnNoWinner: false };
     }
+
 
     console.log(betModel);
     const response = await sendHttpRequest("/Bet/CreateBet", {

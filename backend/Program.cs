@@ -7,7 +7,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PalBet.Data;
 using PalBet.Exceptions;
+using PalBet.Hubs;
 using PalBet.Interfaces;
+using PalBet.Mappers.Notifications;
 using PalBet.Models;
 using PalBet.Repository;
 using PalBet.Services;
@@ -47,8 +49,10 @@ configuration
 .UseRecommendedSerializerSettings()
 .UseSqlServerStorage(builder.Configuration.GetConnectionString("HangfireConnection")));
 
+//Hangfire
 builder.Services.AddHangfireServer();
-
+//SignalR
+builder.Services.AddSignalR();
 
 builder.Services.AddSwaggerGen(option =>
 {
@@ -121,16 +125,7 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
 
-// Add CORS policy
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend", policy =>
-    {
-        policy.WithOrigins("http://localhost:5173") // or 3000 if Create React App
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
+
 
 
 builder.Services.AddScoped<IBetRepository, BetRepository>();
@@ -145,6 +140,19 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IRewardService, RewardService>();
+builder.Services.AddScoped<INotificationMapper, NotificationMapper>();
+
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 
 var app = builder.Build();
 
@@ -158,11 +166,17 @@ if (app.Environment.IsDevelopment())
 
 app.UseHangfireDashboard();
 
+app.MapHub<NotificationHub>("/NotificationHub");
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+
 
 app.UseCors("AllowFrontend");
 

@@ -1,17 +1,54 @@
 import { Await, useLoaderData } from "react-router-dom";
 import { sendHttpRequest } from "../hooks/useHttp";
 import { getAuthToken } from "../util/auth";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import NotificationList from "../components/NotificationList";
+import * as signalR from "@microsoft/signalr";
+
+export function useNotificationsLive(setNotifications) {
+  useEffect(() => {
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl("https://localhost:7130/NotificationHub", { accessTokenFactory: () => getAuthToken()  })
+      .withAutomaticReconnect()
+      .build();
+
+    connection.start();
+
+    connection.on("ReceiveNotification", (notification) => {
+      setNotifications(prev => {
+        if (prev.some(n => n.id === notification.id)) return prev;
+        return [notification, ...prev];
+      });
+    });
+
+    return () => connection.stop();
+  }, []);
+}
 
 export default function NotificationPage() {
     const { notifications } = useLoaderData();
+    const [notificationsList, setNotificationsList] = useState(notifications);
+
+    console.log("Initial notifications:", Promise.resolve(notifications));
+  useEffect(() => {
+    if (notifications) {
+      Promise.resolve(notifications).then(data => {
+        setNotificationsList(data);
+      });
+    }
+  }, [notifications]);
+    console.log("Notifications list state:", notificationsList);
+
+
+    useNotificationsLive(setNotificationsList);
+    console.log("Notifications list after live updates:", notificationsList);
+
     return (
         <>
             <Suspense fallback={<p>Loading Notifications</p>}>
                 <Await resolve={notifications}>
-                    {(loadedNotifications) => (
-                        <NotificationList notifications={loadedNotifications} />
+                    {() => (
+                        <NotificationList notifications={notificationsList} />
                     )}
                 </Await>
             </Suspense>

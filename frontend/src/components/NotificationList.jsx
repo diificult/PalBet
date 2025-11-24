@@ -2,6 +2,8 @@ import NotificationItem from "./NotificationItem";
 import { useFriends } from "../util/friendAction";
 
 export default function NotificationList({ notifications }) {
+
+    console.log("Rendering NotificationList with notifications:", notifications);
     return (
         <div className="">
             {notifications.map((notification) => (

@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using PalBet.Dtos.Notification;
 using PalBet.Enums;
+using PalBet.Hubs;
 using PalBet.Interfaces;
 using PalBet.Mappers;
+using PalBet.Mappers.Notifications;
 using PalBet.Models;
 
 namespace PalBet.Services
@@ -12,13 +15,17 @@ namespace PalBet.Services
         private readonly INotificationRepository _notificationRepository;
         private readonly UserManager<AppUser> _userManager;
         private readonly IBetRepository _betRepository;
+        private readonly IHubContext<NotificationHub> _hub;
+        private readonly INotificationMapper _notificationMapper;
 
 
-        public NotificationService(INotificationRepository notificationRepository, UserManager<AppUser> userManager, IBetRepository betRepository)
+        public NotificationService(INotificationRepository notificationRepository, UserManager<AppUser> userManager, IBetRepository betRepository, IHubContext<NotificationHub> hub, INotificationMapper notificationMapper)
         {
             _notificationRepository = notificationRepository;
             _userManager = userManager;
             _betRepository = betRepository;
+            _hub = hub; 
+            _notificationMapper = notificationMapper;
         }
 
         public async Task<Notification> CreateNotification(NotificationType type, string EntityId, string notifeeId)
@@ -33,6 +40,9 @@ namespace PalBet.Services
             };
 
             var CreatedNotification = await _notificationRepository.CreateNotification(notification);
+
+            await _hub.Clients.User(notifeeId).SendAsync("RecievedNotification", await _notificationMapper.Map(CreatedNotification));
+
             return CreatedNotification;
         }
 
@@ -48,33 +58,8 @@ namespace PalBet.Services
         {
             var notifications = await _notificationRepository.GetNotifications(notifeeId);
             var notificationDtos = new List<NotificationDto>();
-            foreach (Notification notification in notifications) {
-                switch (notification.NotificationType)
-                {
-                    case (NotificationType.FriendRequest):
-                        var appUser = await _userManager.FindByIdAsync(notification.EntityId);
-                        notificationDtos.Add(notification.fromNotifcationToFriendRequestNotificationDto(appUser));
-                        break;
-                    case (NotificationType.BetRequest):
-                        var bet = await _betRepository.GetByIdAsync(int.Parse(notification.EntityId));
-                        notificationDtos.Add(notification.fromNotifcationToBetRequestNotificationDto(bet));
-                        break;
-                    case (NotificationType.BetInPlay):
-                        var bet1 = await _betRepository.GetByIdAsync(int.Parse(notification.EntityId));
-                        notificationDtos.Add(notification.fromNotifcationToBetInPlayNotificationDto(bet1));
-                        break;
-                    case (NotificationType.WinnerChosen):
-                        var bet2 = await _betRepository.GetByIdAsync(int.Parse(notification.EntityId));
-                        //var winner = await _userManager.FindByIdAsync(bet2.UserWinner);
-                        notificationDtos.Add(notification.fromNotifcationToBetWinnerNotificationDto(bet2, null));
-                        break;
-                    case (NotificationType.BetDeadlineReached):
-                        var bet3 = await _betRepository.GetByIdAsync(int.Parse(notification.EntityId));
-                        notificationDtos.Add(notification.fromNotificationToBetDeadlineReachedNotificationDto(bet3));
-                        break;
-                }
-                                    
-            }
+            foreach (Notification notification in notifications) 
+                notificationDtos.Add(await _notificationMapper.Map(notification));
             await MarkAsRead(notifications);
             notificationDtos.Reverse();
             return notificationDtos;

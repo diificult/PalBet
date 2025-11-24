@@ -64,6 +64,8 @@
   </ol>
 </details>
 
+
+
 <!-- ABOUT THE PROJECT -->
 
 ## 📝 About The Project
@@ -73,12 +75,27 @@ The website currently allows users to add other users as friends. Once they beco
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-### 🛠️ Built With
+## 🛠️ Tech Stack
 
--   C#
--   ASP.NET
--   SQL
--   React
+#### **Backend**
+| Technology | Role in the System |
+|-----------|--------------------|
+| **C# / .NET 8** | Core application |
+| **ASP.NET Core** | REST API layer |
+| **Hangfire** |Background job scheduling & processing |
+| **SignalR** |Real-time communication layer |
+#### **Frontend**
+| Technology | Role in the System |
+|-----------|--------------------|
+| **React** | Client-side UI + component architecture |
+| **Tailwind CSS** | Utility-first styling + responsive design |
+| **React Router DOM** | Client-side routing + navigation |
+
+#### **Database**
+| Technology | Role in the System |
+|-----------|--------------------|
+| **SQL** | Persistent data storage |
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
