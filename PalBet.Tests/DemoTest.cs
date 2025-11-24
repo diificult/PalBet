@@ -4,7 +4,7 @@ using PalBet.Models;
 
 namespace PalBet.Tests
 {
-    public class UnitTest1
+    public class DemoTest
     {
         [Fact]
         public void GetUserById_ShouldReturnUser_WhenUserExists()
