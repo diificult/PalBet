@@ -64,8 +64,6 @@
   </ol>
 </details>
 
-
-
 <!-- ABOUT THE PROJECT -->
 
 ## 📝 About The Project
@@ -74,6 +72,7 @@ I wanted to expand my ASP.NET knowledge, and start implementing some React skill
 The website currently allows users to add other users as friends. Once they become friends, you can create "bets" with others, which will notify
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 
 ## 🛠️ Tech Stack
 
@@ -84,6 +83,7 @@ The website currently allows users to add other users as friends. Once they beco
 | **ASP.NET Core** | REST API layer |
 | **Hangfire** |Background job scheduling & processing |
 | **SignalR** |Real-time communication layer |
+
 #### **Frontend**
 | Technology | Role in the System |
 |-----------|--------------------|
@@ -95,7 +95,12 @@ The website currently allows users to add other users as friends. Once they beco
 | Technology | Role in the System |
 |-----------|--------------------|
 | **SQL** | Persistent data storage |
+| **Redis** | Distributed caching + performance optimisation |
 
+#### **DevOps**
+| Technology | Role in the System |
+|-----------|--------------------|
+| **Docker** | Containerisation + consistent deployment environment |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -134,7 +139,7 @@ dotnet run
 
 or run via Visual Studio
 
-Ensure your SQL connection string in appsettings.json is valid & when running, you are in HTTPS mode.
+Ensure your SQL connection string in appsettings.json is valid & when running, and you are in HTTPS mode.
 Backend typically runs at https://localhost:7130.
 
 🎨 Frontend (/frontend)
@@ -167,7 +172,7 @@ Once logged in your bar will update with all your account information. <div/>
 Click on friends page to view friends, requests and requested, and to add new friends
 <img width="1566" height="1326" alt="image" src="https://github.com/user-attachments/assets/c7eb5abb-e685-47e4-a2f3-56fa47f0ac5d" />
 
-Click on bets page to create new bets and view all bets pariticipated in, including requests
+Click on bets page to create new bets and view all bets participated in, including requests
 <img width="1993" height="1324" alt="image" src="https://github.com/user-attachments/assets/b2240b50-8b1b-483d-9ae3-3d9d0d9e3ed0" />
 
 Once on bets page, you can click on create new bet to create a new bet. Fill in these details
@@ -201,7 +206,7 @@ Once on bets page, you can click on create new bet to create a new bet. Fill in 
 ### 0.3 - Daily Rewards
 
 -   [x] Create daily rewards for the user so they can continue to create coins.
--   [x] Create a method to remove coins from the economy to attempt to mitigate inflation risks. (Currently just removed 5% of reward to winner.)
+-   [x] Create a method to remove coins from the economy to attempt to mitigate inflation risks.
 
 ### 0.4 - Improved options for predictions & design
 
@@ -209,17 +214,17 @@ Once on bets page, you can click on create new bet to create a new bet. Fill in 
 -   [x] Create notification when end date reached for a bet - Using hangfire.
 -   [x] Improve page layout and design.
 
-### 0.5 - Optimzations
+### 0.5 - Real-time
 
--   [ ] Create more real time to the website, particularly with notifications. Using SignalR.
+-   [x] Create more real time to the website, particularly with notifications. Using SignalR.
 -   [ ] Introduce caching, most likely redis.
 
 ### 0.6 - Account
 
- -  [ ] Create account details page w/ editing details.
- -  [ ] Gets stats from back end.
- -  [ ] Display stats from components.
- 
+ -  [ ] Create account details page w/ editing details
+ -  [ ] Gets stats from back end
+ -  [ ] Display stats from components
+
 ### 🎯 STRETCH GOAL - Goals that are out of scope for the moment, but desire to do.
 
 -   [ ] (requires validating) Connect to a sport API to allow friends to bet on sporting events.

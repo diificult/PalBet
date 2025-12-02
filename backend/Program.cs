@@ -13,6 +13,7 @@ using PalBet.Mappers.Notifications;
 using PalBet.Models;
 using PalBet.Repository;
 using PalBet.Services;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,8 +52,16 @@ configuration
 
 //Hangfire
 builder.Services.AddHangfireServer();
+
 //SignalR
 builder.Services.AddSignalR();
+
+//Redis
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost"));
+
+
+
+
 
 builder.Services.AddSwaggerGen(option =>
 {

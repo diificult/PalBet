@@ -83,6 +83,7 @@ The website currently allows users to add other users as friends. Once they beco
 | **ASP.NET Core** | REST API layer |
 | **Hangfire** |Background job scheduling & processing |
 | **SignalR** |Real-time communication layer |
+
 #### **Frontend**
 | Technology | Role in the System |
 |-----------|--------------------|
@@ -94,6 +95,12 @@ The website currently allows users to add other users as friends. Once they beco
 | Technology | Role in the System |
 |-----------|--------------------|
 | **SQL** | Persistent data storage |
+| **Redis** | Distributed caching + performance optimisation |
+
+#### **DevOps**
+| Technology | Role in the System |
+|-----------|--------------------|
+| **Docker** | Containerisation + consistent deployment environment |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -114,11 +121,13 @@ Frontend: React (Vite) app (/frontend)
 
 #### 📦 Prerequisites
 
-Visual Studio 2022 (ASP.NET workload)
+Visual Studio 2022+ (ASP.NET workload)
 
-.NET 6+ SDK
+.NET 8 SDK (Moving to 10 soon)
 
 SQL Server
+
+Docker (Install instructions for project coming soon.)
 
 Node.js (LTS) + npm
 
@@ -207,15 +216,15 @@ Once on bets page, you can click on create new bet to create a new bet. Fill in 
 -   [x] Create notification when end date reached for a bet - Using hangfire.
 -   [x] Improve page layout and design.
 
-### 0.5 - Real-time
+### 0.5 - Real-time & Optimization
 
 -   [x] Create more real time to the website, particularly with notifications. Using SignalR.
--   [ ] Introduce caching, most likely redis.
+-   [x] Introduce caching, using redis.
 
 ### 0.6 - Account
 
  -  [ ] Create account details page w/ editing details
- -  [ ] Gets stats from back end
+ -  [ ] Gets stats from back end e.g. leaderboard.
  -  [ ] Display stats from components
 
 ### 🎯 STRETCH GOAL - Goals that are out of scope for the moment, but desire to do.
