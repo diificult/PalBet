@@ -9,5 +9,7 @@ namespace PalBet.Interfaces
         public Task<AppUser> GetUserAsync(string id);
 
         public Task SaveAsync();
+
+        public Task UpdateCoinsBatchAsync(List<BetParticipant> participants, int adjustment);
     }
 }

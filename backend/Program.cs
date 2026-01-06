@@ -1,4 +1,5 @@
 using Hangfire;
+using Hangfire.Dashboard;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
@@ -57,7 +58,17 @@ builder.Services.AddHangfireServer();
 builder.Services.AddSignalR();
 
 //Redis
-builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost"));
+var redisConnection = builder.Configuration.GetConnectionString("Redis") ?? throw new Exception();
+builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(new ConfigurationOptions
+{
+    EndPoints = { redisConnection },
+    AbortOnConnectFail = false,
+    ConnectRetry = 3,
+    ConnectTimeout = 5000,
+
+
+}));
+
 
 
 
@@ -173,7 +184,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHangfireDashboard();
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    IsReadOnlyFunc = (DashboardContext dashboardContext) =>
+    {
+        var context = dashboardContext.GetHttpContext();
+        return !context.User.IsInRole("Admin");
+    }
+});
 
 app.MapHub<NotificationHub>("/NotificationHub");
 

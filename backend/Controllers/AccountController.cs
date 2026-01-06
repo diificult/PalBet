@@ -19,16 +19,13 @@ namespace PalBet.Controllers
         private readonly ITokenService _tokenService;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IAppUserService _appUserService;
-        private readonly IDatabase _redis;
 
-        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager, IAppUserService appUserService, IConnectionMultiplexer muxer)
+        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager, IAppUserService appUserService)
         {
             _userManager = userManager;
             _tokenService = tokenService;
             _signInManager = signInManager;
             _appUserService = appUserService;
-            _redis = muxer.GetDatabase();
-
 
         }
 
@@ -96,26 +93,8 @@ namespace PalBet.Controllers
         {
             var Username = User.GetUsername();
             var appUser = await _userManager.FindByNameAsync(Username);
-            
-            var watch = Stopwatch.StartNew();
 
-            var keyName = $"coins:{appUser.Id}";
-            string json = await _redis.StringGetAsync($"coins:{appUser.Id}");
-            if (string.IsNullOrEmpty(json))
-            {
-                var retrievedCoins =  await _appUserService.GetCoins(appUser.Id);
-                var setTask = _redis.StringSetAsync(keyName, JsonSerializer.Serialize(retrievedCoins.ToString()), TimeSpan.FromMinutes(1));
-                await Task.WhenAll(setTask);
-                watch.Stop();
-                Console.WriteLine($"Time taken to get coins: {watch.ElapsedMilliseconds} ms");
-                return Ok(retrievedCoins);
-                
-            }
-
-            Console.WriteLine(json);
-            var coins = int.Parse(JsonSerializer.Deserialize<string>(json));
-            watch.Stop();
-            Console.WriteLine($"Time taken to get coins: {watch.ElapsedMilliseconds} ms");
+            var coins = await _appUserService.GetCoins(appUser.Id);
 
             return Ok(coins);
         }
