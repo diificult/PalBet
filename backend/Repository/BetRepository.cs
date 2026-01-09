@@ -48,11 +48,6 @@ namespace PalBet.Repository
             return await _context.bets.Include(x => x.Participants).ThenInclude(p => p.AppUser).Include(c => c.Choices).FirstOrDefaultAsync(b => b.Id == id);
         }
 
-        public Task<List<Bet>?> GetRequestedBets(string userId)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<List<Bet>?> GetUsersBets(string userId)
         {
             return await _context.bets.Where(b => b.Participants.Any(p => p.AppUserId == userId && p.Accepted)).Include(b => b.Participants).ThenInclude(p => p.AppUser).Include(b => b.Group).ToListAsync();

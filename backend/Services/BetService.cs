@@ -1,13 +1,12 @@
 ﻿using Hangfire;
-using Microsoft.AspNetCore.Connections.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using PalBet.Dtos.Bet;
 using PalBet.Enums;
 using PalBet.Exceptions;
 using PalBet.Interfaces;
 using PalBet.Mappers;
 using PalBet.Models;
-using System.Diagnostics;
 
 namespace PalBet.Services
 {
@@ -19,14 +18,16 @@ namespace PalBet.Services
         private readonly INotificationService _notificationService;
         private readonly UserManager<AppUser> _userManager;
         private readonly IGroupRepository _groupRepository;
+        private readonly IRedisBetsCacheService _redisBetsCacheService;
 
-        public BetService(IBetRepository betRepository, IAppUserRepository appUserRepository, INotificationService notificationService, UserManager<AppUser> userManager, IGroupRepository groupRepository)
+        public BetService(IBetRepository betRepository, IAppUserRepository appUserRepository, INotificationService notificationService, UserManager<AppUser> userManager, IGroupRepository groupRepository, IRedisBetsCacheService redisBetsCacheService)
         {
             _betRepository = betRepository;
             _userRepository = appUserRepository;
             _notificationService = notificationService;
             _userManager = userManager;
             _groupRepository = groupRepository;
+            _redisBetsCacheService = redisBetsCacheService;
         }
 
         public async Task<bool> AcceptBet(string userId, int betId, string? choice)
@@ -58,11 +59,11 @@ namespace PalBet.Services
                 {
                     throw new CustomException("A choice must be provided to accept this Bet", "BET_USER_CHOICE_REQUIRED", 400);
                 }
-                var createdChoice = new BetChoice { Text = choice };    
+                var createdChoice = new BetChoice { Text = choice };
                 bet.Choices.Add(createdChoice);
                 betParticipant.SelectedChoice = createdChoice;
             }
-             else if (bet.OutcomeChoice == OutcomeChoice.HostDefined)
+            else if (bet.OutcomeChoice == OutcomeChoice.HostDefined)
             {
                 if (string.IsNullOrEmpty(choice))
                 {
@@ -112,17 +113,17 @@ namespace PalBet.Services
 
             }
 
-
-
             await _betRepository.SaveAsync();
 
+            await InvalidateCache(bet.Participants.ToList(), "Requested");
+            await InvalidateCache(bet.Participants.ToList(), "Requests");
 
             return true;
 
 
         }
 
-        public async Task<bool> DeclineBet(string userId, int betId)
+        public async Task DeclineBet(string userId, int betId)
         {
             var bet = await _betRepository.GetByIdAsync(betId);
 
@@ -151,11 +152,12 @@ namespace PalBet.Services
                 throw new CustomException("Bet is not in requested state", "BET_INVALID_STATE", 400);
             }
 
+
+
             bet.State = BetState.Rejected;
             await _betRepository.SaveAsync();
 
-
-            return true;
+            await InvalidateCache(bet.Participants.ToList(), BetState.Requested.ToString());
 
 
         }
@@ -190,9 +192,11 @@ namespace PalBet.Services
             if (betDto.OutcomeChoice == OutcomeChoice.ParticipantAssigned)
             {
 
-               foreach (var p in participants)
+                foreach (var p in participants)
                 {
-                    var choice = new BetChoice { Text = p.AppUser.UserName + " wins"
+                    var choice = new BetChoice
+                    {
+                        Text = p.AppUser.UserName + " wins"
                     };
 
                     choices.Add(choice);
@@ -209,8 +213,6 @@ namespace PalBet.Services
             {
                 choices = new List<BetChoice>();
             }
-
-
 
             Bet betModel = new Bet
             {
@@ -229,9 +231,6 @@ namespace PalBet.Services
                 Choices = choices
             };
 
-
-
-
             //Check to see if all participants have enough coins.
             if (BetType == BetStakeType.Coins)
             {
@@ -244,9 +243,6 @@ namespace PalBet.Services
                 }
             }
 
-
-
-
             var createdBet = await _betRepository.CreateBet(betModel);
             foreach (BetParticipant bp in createdBet.Participants)
             {
@@ -258,21 +254,30 @@ namespace PalBet.Services
 
         public async Task<List<BetDto>?> GetBetRequests(string userId)
         {
-            var bets = await _betRepository.GetBetRequests(userId);
-            return bets.Select(bet => bet.ToBetDtoFromBets(userId)).ToList();
+
+            var bets = await _redisBetsCacheService.GetBetsByStateAsync(userId, "Requests");
+            if (!bets.IsNullOrEmpty()) return bets;
+
+            bets = (await _betRepository.GetBetRequests(userId)).Select(bet => bet.ToBetDtoFromBets(userId)).ToList();
+
+            await _redisBetsCacheService.SetBetsByStateAsync(userId, "Requests", bets);
+
+            return bets;
+
         }
 
         public async Task<List<BetDto>?> GetBetsByState(string userId, BetState? betState)
         {
-            var bets = await _betRepository.GetUsersBets(userId);
             if (betState == null) return null;
 
-            return bets.Where(b => b.State == betState).ToList().Select(bet => bet.ToBetDtoFromBets(userId)).ToList();
-        }
+            var bets = await _redisBetsCacheService.GetBetsByStateAsync(userId, betState.ToString());
+            if (!bets.IsNullOrEmpty()) return bets;
 
-        public Task<List<Bet>?> GetRequestedBets(string userId)
-        {
-            return _betRepository.GetRequestedBets(userId);
+            bets = (await _betRepository.GetUsersBets(userId)).Where(b => b.State == betState).Select(bet => bet.ToBetDtoFromBets(userId)).ToList();
+
+            await _redisBetsCacheService.SetBetsByStateAsync(userId, betState.ToString(), bets);
+
+            return bets;
         }
 
         public async Task DeclareWinner(string updaterUserId, int betId, int winningChoiceId)
@@ -293,16 +298,14 @@ namespace PalBet.Services
 
             bet.State = BetState.Completed;
 
-            
-
             if (bet.BetStakeType == BetStakeType.UserInput) return;
 
-            if (betWinners.Count == 0 )
+            if (betWinners.Count == 0)
             {
                 if (!bet.BurnStakeOnNoWnner)
                 {
                     //Refund all players if no winner and not burning stakes
-                    bet.Participants.ToList().ForEach(async participants => await _userRepository.UpdateCoins(participants.AppUserId, (int) bet.Coins));
+                    bet.Participants.ToList().ForEach(async participants => await _userRepository.UpdateCoins(participants.AppUserId, (int)bet.Coins));
                     return;
                 }
                 else return;
@@ -318,7 +321,8 @@ namespace PalBet.Services
             }
             else
             {
-                betWinners.ForEach(async winner => {
+                betWinners.ForEach(async winner =>
+                {
                     await _userRepository.UpdateCoins(winner.AppUserId, winningAmount);
                     bet.Participants.FirstOrDefault(p => p.AppUserId == winner.AppUserId).IsWinner = true;
                 });
@@ -326,31 +330,23 @@ namespace PalBet.Services
 
             await _betRepository.SaveAsync();
 
+            await InvalidateCache(bet.Participants.ToList(), BetState.InPlay.ToString());
+
         }
 
-        public async Task<bool> DeleteBet(string userId, int betId)
-        {
-
-            //UNUSED
-            var bet = await _betRepository.GetByIdAsync(betId);
-            return false;
-        }
-
-        public async Task<bool> CancelBet(string userId, int betId)
+        public async Task CancelBet(string userId, int betId)
         {
             var bet = await _betRepository.GetByIdAsync(betId);
-            if (bet == null) return false;
+            if (bet == null) throw new CustomException("Bet not found", "BET_NOTFOUND", 404);
 
             //Check to see if the person updating it is the person who should be.
 
-            if (!bet.Participants.FirstOrDefault(p => p.AppUserId == userId).IsBetHost) return false;
+            if (!bet.Participants.FirstOrDefault(p => p.AppUserId == userId).IsBetHost) throw new CustomException("Only the Bet host can cancel the Bet", "BET_CANCEL_INVALIDUSER", 400);
             // Check to see if Bet is in requeted state.
-            if (bet.State != BetState.Requested) return false;
+            if (bet.State != BetState.Requested) throw new CustomException("Bet is not in requested state", "BET_CANCEL_INVALIDSTATE", 400);
 
             bet.State = BetState.Cancelled;
             await _betRepository.SaveAsync();
-
-            return true;
 
         }
 
@@ -363,6 +359,14 @@ namespace PalBet.Services
                 return bet.ToBetDtoFromBets(userId);
             }
             else return null;
+        }
+
+        private async Task InvalidateCache(List<BetParticipant> participants, string betState)
+        {
+            foreach (BetParticipant p in participants)
+            {
+                await _redisBetsCacheService.InvalidateBetsAsync(p.AppUserId, betState);
+            }
         }
     }
 
