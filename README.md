@@ -37,7 +37,7 @@
 <h3 align="center"> 🎲PalBet </h3>
 
   <p align="center">
-    Ever told your mate "I bet you I could do a kick flip". Probably not but you've probably said something similar. Perhaps its a prediction that takes years to know the outcome, so by the time it comes round to it, you've forgotten! I've created a website where you can do exactly that, and not forget. You don't even have to bet real money, using virtual currency, you don't have to risk anything.
+    Have you ever told your mate "I bet you I could do a kick flip"? Probably not but you've probably said something similar. Perhaps its a prediction that takes years to know the outcome, so by the time it comes round to it, you've forgotten! I've created a website where you can do exactly that, and not forget. You don't even have to bet real money, using virtual currency, you don't have to risk anything.
   </p>
 </div>
 
@@ -224,8 +224,6 @@ Once on bets page, you can click on create new bet to create a new bet. Fill in 
 ### 0.6 - Account
 
  -  [ ] Create account details page w/ editing details
- -  [ ] Gets stats from back end e.g. leaderboard.
- -  [ ] Display stats from components
 
 ### 🎯 STRETCH GOAL - Goals that are out of scope for the moment, but desire to do.
 

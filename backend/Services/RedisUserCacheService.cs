@@ -25,7 +25,7 @@ namespace PalBet.Services
 
             var json = await _db.StringGetAsync(Key(userId)).ConfigureAwait(false);
 
-            return json.IsNullOrEmpty ? null : int.Parse(JsonSerializer.Deserialize<string>(json));
+            return json.IsNullOrEmpty ? null : JsonSerializer.Deserialize<int>(json);
         }
     
 

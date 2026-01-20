@@ -7,7 +7,6 @@ import { Bolt, CalendarToday, Group, People, Toll } from "@mui/icons-material";
 
 import { grey } from '@mui/material/colors';
 
-// Helper function to check if deadline has passed
 function isDeadlinePassed(deadlineString) {
     // Parse "dd/MM/yy hh:mm" format
     const [datePart, timePart] = deadlineString.split(" ");
@@ -115,7 +114,7 @@ export default function BetListItem({
 
                 <ul className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
                     {participants && participants.length > 0 ? (
-                        participants.map((p, idx) => <li key={idx}>{p}</li>)
+                        participants.map((p, idx) => <li key={idx}>{p.item1}</li>)
                     ) : (
                         <li>No participants</li>
                     )}

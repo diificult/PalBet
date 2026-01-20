@@ -15,8 +15,12 @@ namespace PalBet.Dtos.Groups
 
         public List<BetDto> Bets { get; set; }
 
+        public List<(string user, int coins)>? Leaderboard { get; set; }
+
         //Group Settings 
         public int DefaultCoinAmount { get; set; }
+
+        
 
      
 

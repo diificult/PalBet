@@ -8,7 +8,7 @@ using PalBet.Models;
 
 namespace PalBet.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class RewardsController : ControllerBase
     {
@@ -23,7 +23,7 @@ namespace PalBet.Controllers
 
         [HttpPut("GetRewards")]
         [Authorize]
-        public async Task<IActionResult> GetRewards()
+        public async Task<ActionResult> GetRewards()
         {
 
             var Username = User.GetUsername();
@@ -35,7 +35,7 @@ namespace PalBet.Controllers
 
         [HttpGet("CheckLast")]
         [Authorize]
-        public async Task<IActionResult> CheckLast()
+        public async Task<ActionResult<string>> CheckLast()
         {
 
             var Username = User.GetUsername();

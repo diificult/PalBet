@@ -8,7 +8,7 @@ using PalBet.Models;
 
 namespace PalBet.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class FriendController : ControllerBase
     {

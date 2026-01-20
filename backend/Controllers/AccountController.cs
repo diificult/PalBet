@@ -1,95 +1,46 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using PalBet.Dtos.Account;
 using PalBet.Extensions;
 using PalBet.Interfaces;
 using PalBet.Models;
-using StackExchange.Redis;
-using System.Diagnostics;
-using System.Text.Json;
+
 
 namespace PalBet.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class AccountController : ControllerBase
     {
 
         private readonly UserManager<AppUser> _userManager;
-        private readonly ITokenService _tokenService;
-        private readonly SignInManager<AppUser> _signInManager;
         private readonly IAppUserService _appUserService;
-
-        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager, IAppUserService appUserService)
+        private readonly IAccountService _accountService;
+        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager, IAppUserService appUserService, IAccountService accountService)
         {
             _userManager = userManager;
-            _tokenService = tokenService;
-            _signInManager = signInManager;
             _appUserService = appUserService;
-
+            _accountService = accountService;
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
+        public async Task<ActionResult<UserDto>> Register([FromBody] RegisterDto dto)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-                var AppUser = new AppUser
-                {
-                    UserName = dto.Username,
-                    Email = dto.EmailAddress,
-                };
-
-                var createUser = await _userManager.CreateAsync(AppUser, dto.Password);
-
-                if (createUser.Succeeded)
-                {
-                    var roleResult = await _userManager.AddToRoleAsync(AppUser, "User");
-                    if (roleResult.Succeeded)
-                        return Ok(
-                        new UserDto
-                        {
-                            UserName = AppUser.UserName,
-                            Email = AppUser.Email,
-                            Token = _tokenService.CreateToken(AppUser)
-                        });
-                    else return StatusCode(500, roleResult.Errors);
-                }
-                else return StatusCode(500, createUser.Errors);
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e);
-            }
+            var account = await _accountService.CreateAccountAsync(dto);
+            return CreatedAtAction(nameof(account), new { }, account);
         }
+
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody]LoginDto dto)
+        public async Task<ActionResult<UserDto>> Login([FromBody]LoginDto dto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == dto.Username.ToLower());
-            if (user == null) return Unauthorized("Invalid Username");
-
-            var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
-
-            if (!result.Succeeded) return Unauthorized("Invalid Username / Password Incorrect");
-
-            return Ok(new UserDto
-            {
-                UserName = user.UserName,
-                Email = user.Email,
-                Token = _tokenService.CreateToken(user)
-            });
+            var account = await _accountService.LoginAsync(dto);
+            return Ok(account);
         }
-        [HttpGet("GetCoins")]
+
+        [HttpGet("coins")]
         [Authorize]
-        public async Task<IActionResult> GetCoins()
+        public async Task<ActionResult<int>> GetCoins()
         {
             var Username = User.GetUsername();
             var appUser = await _userManager.FindByNameAsync(Username);
@@ -98,9 +49,11 @@ namespace PalBet.Controllers
 
             return Ok(coins);
         }
-        [HttpGet("GetUsername")]
+
+
+        [HttpGet("username")]
         [Authorize]
-        public IActionResult GetUsername()
+        public ActionResult<string> GetUsername()
         {
             var Username = User.GetUsername();
             return Ok(Username);

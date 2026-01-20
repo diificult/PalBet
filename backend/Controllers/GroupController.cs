@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PalBet.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class GroupController : ControllerBase
     {

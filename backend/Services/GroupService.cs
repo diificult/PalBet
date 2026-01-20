@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using PalBet.Dtos.Groups;
 using PalBet.Exceptions;
 using PalBet.Interfaces;
@@ -12,11 +13,13 @@ namespace PalBet.Services
 
         private readonly UserManager<AppUser> _userManager;
         private readonly IGroupRepository _groupRepository;
+        private readonly IRedisGroupCacheService _redisGroupCacheService;   
 
-        public GroupService(UserManager<AppUser> userManager, IGroupRepository groupRepository)
+        public GroupService(UserManager<AppUser> userManager, IGroupRepository groupRepository, IRedisGroupCacheService redisGroupCacheService)
         {
             _userManager = userManager;
             _groupRepository = groupRepository;
+            _redisGroupCacheService = redisGroupCacheService;
         }
 
         public async Task AddUser(int groupId, string requesterId, string requesteeId)
@@ -98,7 +101,15 @@ namespace PalBet.Services
         {
             var group = await _groupRepository.GetGroupAsync(groupId);
             if (!group.UserGroups.Select(u => u.UserId).Contains(requesterId)) throw new CustomException("Requester is not a member of the group", "GROUP_ACCESS_DENIED", 403);
-            var groupDto = group.toGroupDetailDtoFromGroup(requesterId);
+
+            var leaderBoard = await _redisGroupCacheService.GetGroupLoaderboardAsync(groupId);
+            if (leaderBoard.IsNullOrEmpty())
+                //Get & set leaderboard
+             await _redisGroupCacheService.SetGroupLeaderboardAsync(groupId, group.UserGroups.ToList() );
+
+             leaderBoard = await _redisGroupCacheService.GetGroupLoaderboardAsync(groupId);
+
+            var groupDto = group.toGroupDetailDtoFromGroup(requesterId, leaderBoard);
 
             return groupDto;
         }

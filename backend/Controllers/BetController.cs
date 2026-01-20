@@ -11,7 +11,7 @@ using PalBet.Enums;
 
 namespace PalBet.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class BetController : ControllerBase
     {
@@ -56,10 +56,9 @@ namespace PalBet.Controllers
             var Username = User.GetUsername();
             var AppUser = await _userManager.FindByNameAsync(Username);
 
-            var Accepted = await _betService.AcceptBet(AppUser.Id, betId, choice);
+            await _betService.AcceptBet(AppUser.Id, betId, choice);
 
-            if (Accepted) return Ok();
-            return NotFound();
+            return Ok();
 
         }
         [HttpPut("RejectBet")]
@@ -69,10 +68,9 @@ namespace PalBet.Controllers
             var Username = User.GetUsername();
             var AppUser = await _userManager.FindByNameAsync(Username);
 
-            var Rejected = await _betService.DeclineBet(AppUser.Id, betId);
+           await _betService.DeclineBet(AppUser.Id, betId);
 
-            if (Rejected) return Ok();
-            return NotFound();
+            return Ok();
         }
 
 
@@ -115,8 +113,8 @@ namespace PalBet.Controllers
             var Username = User.GetUsername();
             var AppUser = await _userManager.FindByNameAsync(Username);
 
-            var bet = await _betService.CancelBet(AppUser.Id, betId);
-            return Ok(bet);
+            await _betService.CancelBet(AppUser.Id, betId);
+            return Ok();
         }
     
     }

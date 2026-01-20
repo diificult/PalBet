@@ -10,5 +10,6 @@
         public ICollection<UserGroup> UserGroups { get; set; } = new List<UserGroup>();
 
         public ICollection<Bet> GroupBets { get; set; } = new List<Bet>();
+
     }
 }

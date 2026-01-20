@@ -24,7 +24,7 @@ export default function AddFriend() {
     const navigation = useNavigation();
     const isSubmitting = navigation.state === "submitting";
     return (
-        <div className=" items-center p-24">
+        <div className=" items-center p-8">
             <fetcher.Form method="post" className="space-y-3">
                 <input type="hidden" name="action" value="add" />
 

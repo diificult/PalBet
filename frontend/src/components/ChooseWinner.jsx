@@ -50,7 +50,7 @@ export default function ChooseWinner() {
                                                 );
                                             }}
                                         >
-                                            {p}
+                                            {p.Item1}
                                         </button>
                                     ))}
                                 </div>

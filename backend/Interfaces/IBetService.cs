@@ -10,7 +10,7 @@ namespace PalBet.Interfaces
         //Gets the bets that others have requested on you.
         Task<List<BetDto>?> GetBetRequests(string userId);
         //Allows a user to accept a Bet
-        Task<bool> AcceptBet(string userId, int betId, string? choice);
+        Task AcceptBet(string userId, int betId, string? choice);
         //User can decline Bet
         Task DeclineBet(string userId, int betId);
         //Choose winner

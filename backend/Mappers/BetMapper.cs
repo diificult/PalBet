@@ -28,7 +28,7 @@ namespace PalBet.Mappers
             return new BetDto
             {
                 BetId = bet.Id,
-                ParticipantNames = bet.Participants?.Select(b => b.AppUser?.UserName).ToList(),
+                ParticipantNames = bet.Participants?.Select(b => (b.AppUser.UserName, b.SelectedChoice?.Text)).ToList(),
                 BetDescription = bet.BetDescription,
                 UserWinner = bet.Participants.Where(p => p.IsWinner == true).Select(p => p.AppUser.UserName).ToList(),
                 BetState = bet.State.ToString(),
@@ -38,7 +38,7 @@ namespace PalBet.Mappers
                 GroupName = bet.Group?.Name,
                 AllowMultipleWinners = bet.AllowMultipleWinners,
                 BurnStakeOnNoWnner = bet.BurnStakeOnNoWnner,
-                OutcomeChoice = bet.OutcomeChoice,
+                OutcomeChoice = bet.OutcomeChoice.ToString(),
                 Choices = bet.Choices?.Select(c => c.Text).ToList(),
 
 

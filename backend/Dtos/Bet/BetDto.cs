@@ -7,7 +7,7 @@ namespace PalBet.Dtos.Bet
 
         public int BetId { set; get; }
 
-        public ICollection<string> ParticipantNames { set; get; }
+        public ICollection<(string UserName, string? choice)> ParticipantNames { set; get; }
         
         public string BetDescription { set; get; }
         public List<string>? UserWinner { set; get; }
@@ -22,7 +22,7 @@ namespace PalBet.Dtos.Bet
         public string? GroupName { set; get; }
 
         public bool AllowMultipleWinners { get; set; } 
-        public OutcomeChoice OutcomeChoice { get; set; }
+        public string OutcomeChoice { get; set; }
         public bool BurnStakeOnNoWnner { get; set; }
         public List<string>? Choices { get; set; }
     }

@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PalBet.Data;
 using PalBet.Exceptions;
+using PalBet.Extensions;
 using PalBet.Hubs;
 using PalBet.Interfaces;
 using PalBet.Mappers.Notifications;
@@ -68,6 +69,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer
 
 
 }));
+
 
 
 
@@ -161,13 +163,17 @@ builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IRewardService, RewardService>();
 builder.Services.AddScoped<INotificationMapper, NotificationMapper>();
+builder.Services.AddScoped<IRedisBetsCacheService, RedisBetsCacheService>();
+builder.Services.AddScoped<IRedisUserCacheService, RedisUserCacheService>();
+builder.Services.AddScoped<IRedisBetCacheService, RedisBetCacheService>();
+builder.Services.AddScoped<IRedisGroupCacheService, RedisGroupCacheService>();
 
 // Add CORS policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins("https://localhost:5173")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -193,6 +199,10 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions
     }
 });
 
+app.UseCors("AllowFrontend");
+
+app.UseSlidingWindowRateLimiter();
+
 app.MapHub<NotificationHub>("/NotificationHub");
 
 app.UseHttpsRedirection();
@@ -205,7 +215,6 @@ var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 
 
-app.UseCors("AllowFrontend");
 
 app.MapControllers();
 app.MapHangfireDashboard();

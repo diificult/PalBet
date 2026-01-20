@@ -30,7 +30,7 @@ namespace PalBet.Services
             _redisBetsCacheService = redisBetsCacheService;
         }
 
-        public async Task<bool> AcceptBet(string userId, int betId, string? choice)
+        public async Task AcceptBet(string userId, int betId, string? choice)
         {
             var bet = await _betRepository.GetByIdAsync(betId);
 
@@ -117,8 +117,6 @@ namespace PalBet.Services
 
             await InvalidateCache(bet.Participants.ToList(), "Requested");
             await InvalidateCache(bet.Participants.ToList(), "Requests");
-
-            return true;
 
 
         }
@@ -248,6 +246,8 @@ namespace PalBet.Services
             {
                 if (!bp.IsBetHost) await _notificationService.CreateNotification(NotificationType.BetRequest, createdBet.Id.ToString(), bp.AppUserId);
             }
+            await InvalidateCache(betModel.Participants.ToList(), "Requested");
+            await InvalidateCache(betModel.Participants.ToList(), "Requests");
 
             return createdBet;
         }
@@ -331,6 +331,7 @@ namespace PalBet.Services
             await _betRepository.SaveAsync();
 
             await InvalidateCache(bet.Participants.ToList(), BetState.InPlay.ToString());
+            await InvalidateCache(bet.Participants.ToList(), BetState.Completed.ToString());
 
         }
 
@@ -354,6 +355,7 @@ namespace PalBet.Services
         {
 
             var bet = await _betRepository.GetByIdAsync(betId);
+            if (bet == null ) throw new CustomException("Bet not found", "BET_NOTFOUND", 404);
             if (bet.Participants.Where(p => p.AppUserId == userId).Any())
             {
                 return bet.ToBetDtoFromBets(userId);
