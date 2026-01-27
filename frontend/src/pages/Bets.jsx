@@ -136,7 +136,7 @@ export async function action({ request }) {
     }
     if (actionType === "cancel") endpoint = "/Bet/CancelBet";
     if (actionType === "winner") {
-        endpoint = "/Bet/ChooseWinner";
+        endpoint = `/Bet/${data}/winner`;
         console.log(request.Username);
         data = { betId: data, winnerUsername: formData.get("winnerUsername") };
     }

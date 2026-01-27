@@ -127,7 +127,7 @@ export default function CreateGroupForm({method}) {
 
     console.log(groupModel);
 
-    const response = await sendHttpRequest("/group/CreateGroup", {
+    const response = await sendHttpRequest("/group/create", {
         method: request.method,
         headers: {
             "Content-Type": "application/json",

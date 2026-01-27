@@ -93,7 +93,7 @@ export default function GroupDetailsPage() {
 
 export async function loader({ params }) {
     const groupId = params.groupId;
-    const response = await sendHttpRequest(`/group/${groupId}/GetDetails`, {
+    const response = await sendHttpRequest(`/group/${groupId}/details`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -124,7 +124,7 @@ export async function action({ params, request }) {
     const actionType = formData.get("action");
 
     if (actionType === "removeUserFromGroup") {
-        return RemoveUserFromGroup({ groupId, username: formData.get("friendUsername") });
+        return UserGroup({ groupId, username: formData.get("friendUsername"), method:"DELETE" });
     }
     if (actionType === "SaveGroupSettings") {
         return EditGroupSettings({ groupId, request });
@@ -133,7 +133,7 @@ export async function action({ params, request }) {
         return UpdateUserPermissions({ groupId, formData });
     }
     if (actionType === "AddUser") {
-        return AddUserToGroup({ groupId, usernameToAdd: formData.get("usernameToAdd") });
+        return UserGroup({ groupId, usernameToAdd: formData.get("usernameToAdd"), method:"POST" });
     }
 
     
@@ -145,7 +145,7 @@ async function EditGroupSettings({groupId, request}) {
 
  const formData = await request.formData();
     const updatedDefaultCoinBalance = formData.get("defaultCointBalance");
-    const response = await sendHttpRequest(`/group/EditGroup`, {
+    const response = await sendHttpRequest(`/group/edit`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -169,17 +169,13 @@ async function EditGroupSettings({groupId, request}) {
     return (redirect(`/groups/${groupId}`));
 }
 
-async function RemoveUserFromGroup({groupId, username}) {
-    const response = await sendHttpRequest("/group/RemoveUser", {
-        method: "DELETE",
+async function UserGroup({groupId, username, method}) {
+    const response = await sendHttpRequest(`/group/${groupId}/members/${username}`, {
+        method: method,
         headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + getAuthToken(),
         },
-        body: JSON.stringify({
-            groupId: groupId,
-            username: username,
-        }),
     }); 
     if (!response.ok) {
         throw new Response(
@@ -191,41 +187,19 @@ async function RemoveUserFromGroup({groupId, username}) {
             }
     return redirect(`/groups/${groupId}`); 
  }
- async function AddUserToGroup({groupId, username}) {
-    const response = await sendHttpRequest("/group/AddUser", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + getAuthToken(),
-        },
-        body: JSON.stringify({
-            groupId: groupId,
-            username: username,
-        }),
-    }); 
-    if (!response.ok) {
-        throw new Response(
-            JSON.stringify({ message: "Could not add user from group" }),
-            {
-                status: 422,
-            }
-        );
-            }
-    return redirect(`/groups/${groupId}`); 
- }
+
 
  async function UpdateUserPermissions({ groupId, formData }) {
     const username = formData.get("username");
     const canCreate = formData.get("canCreateBets") === "1";
 
-    const response = await sendHttpRequest("/group/EditUserPermissions", {
+    const response = await sendHttpRequest(`/group/${groupId}/edit-permissions`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + getAuthToken(),
         },
         body: JSON.stringify({
-            groupId,
             username,
             CanCreateBets: canCreate,
         }),

@@ -89,9 +89,9 @@ namespace PalBet.Services
             return createdGroup;
         }
 
-        public async Task EditGroup(EditGroupDto dto, string requesterId)
+        public async Task EditGroup(int groupId, EditGroupDto dto, string requesterId)
         {
-            var group = await _groupRepository.GetGroupAsync(dto.GroupId);
+            var group = await _groupRepository.GetGroupAsync(groupId);
             if (!group.UserGroups.FirstOrDefault(u => u.UserId == requesterId).IsAdmin) throw new CustomException("Only admins can edit the group", "GROUP_EDIT_DENIED", 403);
             group.DefaultCoinBalance = dto.DefaultCoinBalance;
             await _groupRepository.SaveAsync();
@@ -133,9 +133,9 @@ namespace PalBet.Services
             return groupsDto;
         }
 
-        public async Task EditMemberPermissons(EditGroupMemberPermissionsDto dto, string requesterId)
+        public async Task EditMemberPermissons(int groupId, EditGroupMemberPermissionsDto dto, string requesterId)
         {
-            var group = await _groupRepository.GetGroupAsync(dto.GroupId);
+            var group = await _groupRepository.GetGroupAsync(groupId);
             if (!group.UserGroups.FirstOrDefault(u => u.UserId == requesterId).IsAdmin) throw new CustomException("Only admins can edit member permissions", "GROUP_EDITMEMBERPERMISSIONS_DENIED", 403);
             var userGroup = group.UserGroups.FirstOrDefault(u => u.User.UserName == dto.Username) ?? throw new CustomException("User is not a member of the group", "GROUP_EDITMEMBERPERMISSIONS_NOTMEMBER", 400);
 

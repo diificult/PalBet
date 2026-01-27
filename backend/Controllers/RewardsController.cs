@@ -21,9 +21,9 @@ namespace PalBet.Controllers
             _userManager = userManager;
         }
 
-        [HttpPut("GetRewards")]
+        [HttpPut("collect")]
         [Authorize]
-        public async Task<ActionResult> GetRewards()
+        public async Task<ActionResult> CollectRewards()
         {
 
             var Username = User.GetUsername();
@@ -33,7 +33,7 @@ namespace PalBet.Controllers
             return Ok();
         }
 
-        [HttpGet("CheckLast")]
+        [HttpGet("check")]
         [Authorize]
         public async Task<ActionResult<string>> CheckLast()
         {

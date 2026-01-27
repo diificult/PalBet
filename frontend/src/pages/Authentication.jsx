@@ -25,7 +25,7 @@ export async function action({ request }) {
         authData.EmailAddress = data.get("email");
     }
 
-    const response = await sendHttpRequest(`/${mode}`, {
+    const response = await sendHttpRequest(`/account/${mode}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -43,7 +43,7 @@ export async function action({ request }) {
     expiration.setHours(expiration.getHours() + 24);
     localStorage.setItem("expiration", expiration.toISOString());
 
-    const usernameResponse = await sendHttpRequest("/GetUsername", {
+    const usernameResponse = await sendHttpRequest("/account/username", {
         method: "GET",
         headers: {
             "Content-Type": "application/json",

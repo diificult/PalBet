@@ -133,7 +133,7 @@ export async function loader({params, request}) {
 }
 
 async function loadBet(id) {
-        var response = await sendHttpRequest("/Bet/GetBetFromId/"+id, {
+        var response = await sendHttpRequest("/Bet/"+id, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",

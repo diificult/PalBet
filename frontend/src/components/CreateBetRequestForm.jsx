@@ -225,7 +225,7 @@ export async function loader({ params }) {
     return { participants };
 }
 async function loadFriends() {
-    const response = await sendHttpRequest("/friend/GetFriendsList", {
+    const response = await sendHttpRequest("/friend/friends", {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -244,7 +244,7 @@ async function loadFriends() {
 }
 
 async function loadGroupMembers(groupId) {
-    const response = await sendHttpRequest(`/group/${groupId}/GetMembers`, {
+    const response = await sendHttpRequest(`/group/${groupId}/members`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -313,7 +313,7 @@ export async function action({ request, params }) {
 
 
     console.log(betModel);
-    const response = await sendHttpRequest("/Bet/CreateBet", {
+    const response = await sendHttpRequest("/Bet/create", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

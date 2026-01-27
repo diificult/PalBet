@@ -79,7 +79,7 @@ export default function Friends() {
 }
 
 async function loadFriends() {
-    const response = await sendHttpRequest("/Friend/GetFriendsList", {
+    const response = await sendHttpRequest("/Friend/me", {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -99,7 +99,7 @@ async function loadFriends() {
     return resData;
 }
 async function loadFriendRequests() {
-    const response = await sendHttpRequest("/Friend/GetFriendRequests", {
+    const response = await sendHttpRequest("/Friend/requests", {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -119,7 +119,7 @@ async function loadFriendRequests() {
     return resData;
 }
 async function loadFriendRequested() {
-    const response = await sendHttpRequest("/Friend/GetFriendRequested", {
+    const response = await sendHttpRequest("/Friend/requested", {
         method: "GET",
         headers: {
             "Content-Type": "application/json",

@@ -23,8 +23,7 @@ namespace PalBet.Controllers
             _userManager = userManager; 
         }
 
-        //Get Noitifications
-        [HttpGet("GetNotifications")]
+        [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetNotifications() {
 
@@ -37,9 +36,8 @@ namespace PalBet.Controllers
 
         //Read Notification (Should do it instead when got???)
 
-        //Get Notification Count
-        //Get Noitifications
-        [HttpGet("GetCount")]
+
+        [HttpGet("count")]
         [Authorize]
         public async Task<IActionResult> GetNotificationCount()
         {

@@ -44,7 +44,7 @@ export default function GroupsPage() {
 
 export async function loader() {
 
-    const response = await sendHttpRequest("/group/GetUserGroups", {
+    const response = await sendHttpRequest(`/group/me`, {
         method: "GET",
         headers: {
                     "Content-Type": "application/json",

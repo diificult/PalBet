@@ -57,7 +57,7 @@ export default function NotificationPage() {
 }
 
 async function loadNotifications() {
-    const response = await sendHttpRequest("/Notification/GetNotifications", {
+    const response = await sendHttpRequest("/Notification", {
         method: "GET",
         headers: {
             "Content-Type": "application/json",

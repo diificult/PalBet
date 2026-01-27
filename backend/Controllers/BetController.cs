@@ -25,7 +25,7 @@ namespace PalBet.Controllers
             _userManager = userManager;
         }
         
-        [HttpPost("CreateBet")]
+        [HttpPost("create")]
         [Authorize]
         public async Task<IActionResult> CreateNewBet([FromBody] CreateBetDto dto)
         {
@@ -38,7 +38,7 @@ namespace PalBet.Controllers
             else return StatusCode(500, "Could not create, most likely not enough coins from a user");
         }
 
-        [HttpGet("GetBetRequests")]
+        [HttpGet("requests")]
         [Authorize]
         public async Task<IActionResult> GetBetRequests()
         {            //Todo put these two lines into a seperate bit
@@ -49,7 +49,7 @@ namespace PalBet.Controllers
             return Ok(bets);
         }
 
-        [HttpPut("{BetId}/AcceptBet")]
+        [HttpPut("{BetId}/accept")]
         [Authorize]
         public async Task<IActionResult> AcceptBet([FromRoute] int betId, [FromBody] string? choice)
         {
@@ -61,7 +61,7 @@ namespace PalBet.Controllers
             return Ok();
 
         }
-        [HttpPut("RejectBet")]
+        [HttpPut("reject")]
         [Authorize]
         public async Task<IActionResult> RejectBet([FromBody] int betId)
         {
@@ -75,7 +75,7 @@ namespace PalBet.Controllers
 
 
 
-        [HttpPut("{BetId}/DeclareWinner")]
+        [HttpPut("{BetId}/winner")]
         [Authorize]
         public async Task<IActionResult> DeclareWinner([FromRoute] int BetId, [FromBody] int ChoiceId)
         {
@@ -85,7 +85,7 @@ namespace PalBet.Controllers
             return Ok();
         }
 
-        [HttpGet("GetBetFromState")]
+        [HttpGet("state")]
         [Authorize]
         public async Task<IActionResult> GetBetFromState([FromQuery] BetState? state)
         {
@@ -96,7 +96,7 @@ namespace PalBet.Controllers
             return Ok(bets);
         }
 
-        [HttpGet("GetBetFromId/{BetId}")]
+        [HttpGet("{BetId}")]
         [Authorize]
         public async Task<IActionResult> GetBetFromId([FromRoute] int betId)
         {
@@ -106,7 +106,7 @@ namespace PalBet.Controllers
             return Ok(bet);
         }
 
-        [HttpPut("CancelBet")]
+        [HttpPut("cancel")]
         [Authorize]
         public async Task<IActionResult> CancelBet([FromBody] int betId)
         {

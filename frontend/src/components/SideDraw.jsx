@@ -156,7 +156,7 @@ export async function loader() {
 }
 
 async function getCoins() {
-    const response = await sendHttpRequest("/GetCoins", {
+    const response = await sendHttpRequest("/account/coins", {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -168,7 +168,7 @@ async function getCoins() {
 }
 
 async function getDailyRewardsTimeRemaining() {
-    const response = await sendHttpRequest("/Rewards/CheckLast", {
+    const response = await sendHttpRequest("/Rewards/check", {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -179,7 +179,7 @@ async function getDailyRewardsTimeRemaining() {
     return resData;
 }
 async function getNotifications() {
-    const response = await sendHttpRequest("/Notification/GetCount", {
+    const response = await sendHttpRequest("/Notification/count", {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -192,7 +192,7 @@ async function getNotifications() {
 
 export async function action() {
     
- const response = await sendHttpRequest("/Rewards/GetRewards", {
+ const response = await sendHttpRequest("/Rewards/collect", {
     method: "PUT",
     headers: {
         "Content-Type": "application/json",

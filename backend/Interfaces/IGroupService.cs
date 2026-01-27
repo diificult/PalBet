@@ -15,8 +15,8 @@ namespace PalBet.Interfaces
 
         public Task AddUser(int groupId, string requesterId, string requesteeId);
         public Task RemoveUser(int groupId, string requesterId, string requesteeId);
-        public Task EditGroup(EditGroupDto dto, string requesterId);
-        public Task EditMemberPermissons(EditGroupMemberPermissionsDto dto, string requesterId);
+        public Task EditGroup(int groupId, EditGroupDto dto, string requesterId);
+        public Task EditMemberPermissons(int groupId, EditGroupMemberPermissionsDto dto, string requesterId);
 
     }
 }

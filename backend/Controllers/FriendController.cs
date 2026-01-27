@@ -46,7 +46,7 @@ namespace PalBet.Controllers
 
         //Accept Request
 
-        [HttpPut("AcceptFriendRequest")]
+        [HttpPut("accept")]
         [Authorize]
         public async Task<IActionResult> AcceptRequest([FromBody]string Username)
         {
@@ -64,7 +64,7 @@ namespace PalBet.Controllers
 
         //Cancel Request
 
-        [HttpDelete("CancelFriendRequest")]
+        [HttpDelete("cancel")]
         [Authorize]
         public async Task<IActionResult> CancelFriendRequest([FromBody] string Username)
         {
@@ -80,7 +80,7 @@ namespace PalBet.Controllers
 
         //Decline Request
 
-        [HttpDelete("DeclineFriendRequest")]
+        [HttpDelete("decline")]
         [Authorize]
         public async Task<IActionResult> DeclineFriendRequest([FromBody] string Username)
         {
@@ -99,7 +99,7 @@ namespace PalBet.Controllers
         //Block User
 
         //Get all friends
-        [HttpGet("GetFriendsList")]
+        [HttpGet("me")]
         [Authorize]
         public async Task<IActionResult> GetFriendsList()
         {
@@ -111,7 +111,7 @@ namespace PalBet.Controllers
 
 
         //Get all friend requests
-        [HttpGet("GetFriendRequests")]
+        [HttpGet("requests")]
         [Authorize]
         public async Task<IActionResult> GetFriendRequests()
         {
@@ -120,7 +120,7 @@ namespace PalBet.Controllers
             var List = await _friendService.GetFriendRequests(AppUser.Id);
             return Ok(List);
         }
-        [HttpGet("GetFriendRequested")]
+        [HttpGet("requested")]
         [Authorize]
         public async Task<IActionResult> GetFriendRequested()
         {
