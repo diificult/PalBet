@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using PalBet.Extensions;
 using PalBet.Interfaces;
@@ -16,35 +14,32 @@ namespace PalBet.Controllers
     {
 
         private readonly INotificationService _notificationService;
-            private readonly UserManager<AppUser> _userManager;
-        public NotificationController(INotificationService notificationService, UserManager<AppUser> userManager) {
-        
+        private readonly UserManager<AppUser> _userManager;
+        public NotificationController(INotificationService notificationService, UserManager<AppUser> userManager)
+        {
+
             _notificationService = notificationService;
-            _userManager = userManager; 
+            _userManager = userManager;
         }
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetNotifications() {
+        public async Task<IActionResult> GetNotifications()
+        {
 
-            var Username = User.GetUsername();
-            var AppUser = await _userManager.FindByNameAsync(Username);
-            var Notifications = await _notificationService.GetNotifications(AppUser.Id);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
+            var Notifications = await _notificationService.GetNotifications(userId);
             if (Notifications.IsNullOrEmpty()) { return NoContent(); }
             return Ok(Notifications);
         }
-
-        //Read Notification (Should do it instead when got???)
-
 
         [HttpGet("count")]
         [Authorize]
         public async Task<IActionResult> GetNotificationCount()
         {
 
-            var Username = User.GetUsername();
-            var AppUser = await _userManager.FindByNameAsync(Username);
-            var Notifications = await _notificationService.GetNotificationCount(AppUser.Id);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
+            var Notifications = await _notificationService.GetNotificationCount(userId);
             return Ok(Notifications);
         }
 

@@ -42,10 +42,8 @@ namespace PalBet.Controllers
         [Authorize]
         public async Task<ActionResult<int>> GetCoins()
         {
-            var Username = User.GetUsername();
-            var appUser = await _userManager.FindByNameAsync(Username);
-
-            var coins = await _appUserService.GetCoins(appUser.Id);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
+            var coins = await _appUserService.GetCoins(userId);
 
             return Ok(coins);
         }

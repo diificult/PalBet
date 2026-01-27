@@ -30,9 +30,9 @@ namespace PalBet.Controllers
         public async Task<IActionResult> CreateNewBet([FromBody] CreateBetDto dto)
         {
 
-            var Username = User.GetUsername();
-            dto.ParticipantUsernames.Add(Username);
-            var bet = await _betService.CreateBet(dto, Username);
+            var username = User.GetUsername();
+            dto.ParticipantUsernames.Add(username);
+            var bet = await _betService.CreateBet(dto, username);
             if (bet != null)
                 return Created();
             else return StatusCode(500, "Could not create, most likely not enough coins from a user");
@@ -41,10 +41,9 @@ namespace PalBet.Controllers
         [HttpGet("requests")]
         [Authorize]
         public async Task<IActionResult> GetBetRequests()
-        {            //Todo put these two lines into a seperate bit
-            var Username = User.GetUsername();
-            var appUser = await _userManager.FindByNameAsync(Username);
-            var bets = await _betService.GetBetRequests(appUser.Id);
+        {         
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
+            var bets = await _betService.GetBetRequests(userId);
             if (bets == null) return NotFound();
             return Ok(bets);
         }
@@ -53,10 +52,8 @@ namespace PalBet.Controllers
         [Authorize]
         public async Task<IActionResult> AcceptBet([FromRoute] int betId, [FromBody] string? choice)
         {
-            var Username = User.GetUsername();
-            var AppUser = await _userManager.FindByNameAsync(Username);
-
-            await _betService.AcceptBet(AppUser.Id, betId, choice);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
+            await _betService.AcceptBet(userId, betId, choice);
 
             return Ok();
 
@@ -65,10 +62,9 @@ namespace PalBet.Controllers
         [Authorize]
         public async Task<IActionResult> RejectBet([FromBody] int betId)
         {
-            var Username = User.GetUsername();
-            var AppUser = await _userManager.FindByNameAsync(Username);
 
-           await _betService.DeclineBet(AppUser.Id, betId);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
+            await _betService.DeclineBet(userId, betId);
 
             return Ok();
         }
@@ -79,9 +75,8 @@ namespace PalBet.Controllers
         [Authorize]
         public async Task<IActionResult> DeclareWinner([FromRoute] int BetId, [FromBody] int ChoiceId)
         {
-            var Username = User.GetUsername();
-            var AppUser = await _userManager.FindByNameAsync(Username);
-            await _betService.DeclareWinner(AppUser.Id, BetId, ChoiceId);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
+            await _betService.DeclareWinner(userId, BetId, ChoiceId);
             return Ok();
         }
 
@@ -89,10 +84,8 @@ namespace PalBet.Controllers
         [Authorize]
         public async Task<IActionResult> GetBetFromState([FromQuery] BetState? state)
         {
-            var Username = User.GetUsername();
-            var AppUser = await _userManager.FindByNameAsync(Username);
-
-            var bets = await _betService.GetBetsByState(AppUser.Id, state);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
+            var bets = await _betService.GetBetsByState(userId, state);
             return Ok(bets);
         }
 
@@ -100,9 +93,8 @@ namespace PalBet.Controllers
         [Authorize]
         public async Task<IActionResult> GetBetFromId([FromRoute] int betId)
         {
-            var Username = User.GetUsername();
-            var AppUser = await _userManager.FindByNameAsync(Username);
-            var bet = await _betService.GetBetById(AppUser.Id, betId);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
+            var bet = await _betService.GetBetById(userId, betId);
             return Ok(bet);
         }
 
@@ -110,10 +102,9 @@ namespace PalBet.Controllers
         [Authorize]
         public async Task<IActionResult> CancelBet([FromBody] int betId)
         {
-            var Username = User.GetUsername();
-            var AppUser = await _userManager.FindByNameAsync(Username);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
 
-            await _betService.CancelBet(AppUser.Id, betId);
+            await _betService.CancelBet(userId, betId);
             return Ok();
         }
     

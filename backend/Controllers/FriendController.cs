@@ -24,18 +24,18 @@ namespace PalBet.Controllers
         //Send Request
         [HttpPost("SendRequest")]
         [Authorize]
-        public async Task<IActionResult> SendRequest([FromBody]string Username)
+        public async Task<ActionResult<Friendship?>> SendRequest([FromBody]string Username)
         {
+            var RequesteeId = await _userManager.FindByNameAsync(Username);
+            if (RequesteeId == null) throw new CustomException("This user does not exist", "USER_NOTFOUND", 400);
 
             var RequesterUsername = User.GetUsername();
             var RequesterId = await _userManager.FindByNameAsync(RequesterUsername);
-            var RequesteeId = await _userManager.FindByNameAsync(Username);
-            if (RequesteeId == null) throw new CustomException("This user does not exist", "USER_NOTFOUND", 400);
 
             var newFriendRequest = await _friendService.FriendshipRequest(RequesterId.Id, RequesteeId.Id);
 
             
-            if (newFriendRequest == null) return NotFound();
+            if (newFriendRequest == null) throw new CustomException("Could not send friend request", "FRIEND_REQUEST_FAILED", 400);
 
             return Ok(newFriendRequest);
 
@@ -50,14 +50,14 @@ namespace PalBet.Controllers
         [Authorize]
         public async Task<IActionResult> AcceptRequest([FromBody]string Username)
         {
+            var RequesterId = await _userManager.FindByNameAsync(Username);
+            if (RequesterId == null) throw new CustomException("This user does not exist", "USER_NOTFOUND", 400);
+
             var AccepteeUsername = User.GetUsername();
             var AccepteeId = await _userManager.FindByNameAsync(AccepteeUsername);
-            var RequesterId = await _userManager.FindByNameAsync(Username);
-
-            if (RequesterId == null) return BadRequest("Could not find user");
 
             var acceptRequest = await _friendService.AcceptRequest(RequesterId.Id, AccepteeId.Id);
-            if (acceptRequest == false) return BadRequest("Could not accept");
+            if (acceptRequest == false) throw new CustomException("Could not accept friend request", "FRIEND_REQUEST_FAILED", 400);
             return Ok();
         }
 
@@ -71,10 +71,10 @@ namespace PalBet.Controllers
             var RequesterUsername = User.GetUsername();
             var Requester = await _userManager.FindByNameAsync(RequesterUsername);
             var Requestee = await _userManager.FindByNameAsync(Username);
-            if (Requestee == null) return BadRequest("Could not find user");
+            if (Requestee == null) throw new CustomException("This user does not exist", "USER_NOTFOUND", 400);
 
             var deletedRequest = await _friendService.CancelRequest(Requester.Id, Requestee.Id);
-            if (deletedRequest == false) return BadRequest("Could not cancel request");
+            if (deletedRequest == false) throw new CustomException("Could not cancel friend request", "FRIEND_REQUEST_FAILED", 400);
             return Ok();
         }
 
@@ -87,10 +87,10 @@ namespace PalBet.Controllers
             var RequesterUsername = User.GetUsername();
             var Requestee = await _userManager.FindByNameAsync(RequesterUsername);
             var Requester = await _userManager.FindByNameAsync(Username);
-            if (Requester == null) return BadRequest("Could not find user");
+            if (Requester == null) throw new CustomException("This user does not exist", "USER_NOTFOUND", 400);
 
             var deletedRequest = await _friendService.CancelRequest(Requester.Id, Requestee.Id);
-            if (deletedRequest == false) return BadRequest("Could not decline request");
+            if (deletedRequest == false) throw new CustomException("Could not decline friend request", "FRIEND_REQUEST_FAILED", 400);
             return Ok();
         }
 
@@ -103,9 +103,8 @@ namespace PalBet.Controllers
         [Authorize]
         public async Task<IActionResult> GetFriendsList()
         {
-            var Username = User.GetUsername();
-            var AppUser = await _userManager.FindByNameAsync(Username);
-            var List = await _friendService.GetFriendsList(AppUser.Id);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
+            var List = await _friendService.GetFriendsList(userId);
             return Ok(List);
         }
 
@@ -115,18 +114,16 @@ namespace PalBet.Controllers
         [Authorize]
         public async Task<IActionResult> GetFriendRequests()
         {
-            var Username = User.GetUsername();
-            var AppUser = await _userManager.FindByNameAsync(Username);
-            var List = await _friendService.GetFriendRequests(AppUser.Id);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
+            var List = await _friendService.GetFriendRequests(userId);
             return Ok(List);
         }
         [HttpGet("requested")]
         [Authorize]
         public async Task<IActionResult> GetFriendRequested()
         {
-            var Username = User.GetUsername();
-            var AppUser = await _userManager.FindByNameAsync(Username);
-            var List = await _friendService.GetFriendRequested(AppUser.Id);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
+            var List = await _friendService.GetFriendRequested(userId);
             return Ok(List);
         }
 

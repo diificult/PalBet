@@ -26,9 +26,8 @@ namespace PalBet.Controllers
         public async Task<ActionResult> CollectRewards()
         {
 
-            var Username = User.GetUsername();
-            var appUser = await _userManager.FindByNameAsync(Username);
-            await _rewardService.GetRewards(appUser.Id);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
+            await _rewardService.GetRewards(userId);
 
             return Ok();
         }
@@ -38,10 +37,8 @@ namespace PalBet.Controllers
         public async Task<ActionResult<string>> CheckLast()
         {
 
-            var Username = User.GetUsername();
-            var appUser = await _userManager.FindByNameAsync(Username);
-
-            var timeRemaining = await _rewardService.GetTimeRemaining(appUser.Id);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
+            var timeRemaining = await _rewardService.GetTimeRemaining(userId);
             return Ok(timeRemaining);
         }
 

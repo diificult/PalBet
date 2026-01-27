@@ -36,9 +36,8 @@ namespace PalBet.Controllers
         [Authorize]
         public async Task<IActionResult> GetUserGroups()
         {
-            var Username = User.GetUsername();
-            var appUser = await _userManager.FindByNameAsync(Username);
-            var groups = await _groupService.GetUserGroups(appUser.Id);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
+            var groups = await _groupService.GetUserGroups(userId);
             return Ok(groups);
 
 
@@ -48,11 +47,8 @@ namespace PalBet.Controllers
         [Authorize]
         public async Task<IActionResult> GetGroupMembers([FromRoute] int id)
         {
-            var Username = User.GetUsername();
-            var appUser = await _userManager.FindByNameAsync(Username);
-
-            var groupMembers = await _groupService.GetGroupMembers(id, appUser.Id);
-            
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
+            var groupMembers = await _groupService.GetGroupMembers(id, userId);
 
             return Ok(groupMembers);
         }
@@ -62,11 +58,10 @@ namespace PalBet.Controllers
         public async Task<IActionResult> AddUser([FromRoute] int id, [FromRoute] string username)
         {
 
-            var Username = User.GetUsername();
-            var appUser = await _userManager.FindByNameAsync(Username);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
             var requesteeAppUser = await _userManager.FindByNameAsync(username);
 
-            await _groupService.AddUser(id, appUser.Id, requesteeAppUser.Id);
+            await _groupService.AddUser(id, userId, requesteeAppUser.Id);
 
             return Ok();
         }
@@ -74,10 +69,9 @@ namespace PalBet.Controllers
         [Authorize]
         public async Task<IActionResult> RemoveUser([FromRoute] int id, [FromRoute] string username)
         {
-            var Username = User.GetUsername();
-            var appUser = await _userManager.FindByNameAsync(Username);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
             var requesteeAppUser = await _userManager.FindByNameAsync(username);
-            await _groupService.RemoveUser(id, appUser.Id, requesteeAppUser.Id);
+            await _groupService.RemoveUser(id, userId, requesteeAppUser.Id);
             return Ok();
         }
 
@@ -85,9 +79,8 @@ namespace PalBet.Controllers
         [Authorize]
         public async Task<IActionResult> GetGroupDetails([FromRoute] int id)
         {
-            var Username = User.GetUsername();
-            var appUser = await _userManager.FindByNameAsync(Username);
-            var groupDetails = await _groupService.GetGroupDetails(id, appUser.Id);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
+            var groupDetails = await _groupService.GetGroupDetails(id, userId);
 
             return Ok(groupDetails);
         }
@@ -97,9 +90,8 @@ namespace PalBet.Controllers
         [Authorize]
         public async Task<IActionResult> EditGroup([FromRoute]int id, [FromBody] EditGroupDto dto)
         {
-            var Username = User.GetUsername();
-            var appUser = await _userManager.FindByNameAsync(Username);
-            await _groupService.EditGroup(id, dto, appUser.Id);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
+            await _groupService.EditGroup(id, dto, userId);
             return Ok();
         }
 
@@ -107,9 +99,8 @@ namespace PalBet.Controllers
         [Authorize]
         public async Task<IActionResult> EditUserPermissions([FromRoute] int id, [FromBody] EditGroupMemberPermissionsDto dto)
         {
-            var Username = User.GetUsername();
-            var appUser = await _userManager.FindByNameAsync(Username);
-            await _groupService.EditMemberPermissons(id, dto, appUser.Id);
+            var userId = await User.GetCurrentUserIdAsync(_userManager);
+            await _groupService.EditMemberPermissons(id, dto, userId);
             return Ok();
         }
 
