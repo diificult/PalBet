@@ -225,7 +225,7 @@ export async function loader({ params }) {
     return { participants };
 }
 async function loadFriends() {
-    const response = await sendHttpRequest("/friend/friends", {
+    const response = await sendHttpRequest("/friend/me", {
         method: "GET",
         headers: {
             "Content-Type": "application/json",

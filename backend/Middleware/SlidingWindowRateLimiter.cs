@@ -96,7 +96,7 @@ namespace PalBet.Middleware
 
             // Skip for explicit anonymous paths (login/register)
             var path = httpContext.Request.Path.Value?.ToLowerInvariant() ?? string.Empty;
-            if (path.StartsWith("/login") || path.StartsWith("/register"))
+            if (path.StartsWith("/api/account/login") || path.StartsWith("/api/account/register"))
             {
                 await _next(httpContext);
                 return;

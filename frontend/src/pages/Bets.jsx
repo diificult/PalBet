@@ -115,10 +115,10 @@ async function loadBets(domain) {
 
 export async function loader() {
     return {
-        betRequests: loadBets("/GetBetRequests"),
-        betRequested: loadBets("/GetBetFromState?state=1"),
-        openBets: loadBets("/GetBetFromState?state=3"),
-        completedBets: loadBets("/GetBetFromState?state=4"),
+        betRequests: loadBets("/requests"),
+        betRequested: loadBets("/state?state=1"),
+        openBets: loadBets("/state?state=3"),
+        completedBets: loadBets("/state?state=4"),
     };
 }
 

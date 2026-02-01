@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 
-const BASEURL = "https://localhost:7130/api";
+const BASEURL = "http://localhost:8080/api";
 
 export async function sendHttpRequest(path, config) {
     const response = await fetch(BASEURL + path, config);

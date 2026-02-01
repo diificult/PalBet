@@ -5,7 +5,11 @@ import mkcert from 'vite-plugin-mkcert'
 // https://vite.dev/config/
 export default defineConfig({
     plugins: [react(), tailwindcss(), mkcert()],
-
+    server: {
+        host:true,
+        port:4173,
+        strictPort:true,
+    }
 
     
 });

@@ -92,7 +92,7 @@ export default function CreateGroupForm({method}) {
  }
 
  async function loadFriends() {
-     const response = await sendHttpRequest("/friend/GetFriendsList", {
+     const response = await sendHttpRequest("/friend/me", {
          method: "GET",
          headers: {
              "Content-Type": "application/json",

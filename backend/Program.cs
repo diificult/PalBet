@@ -162,6 +162,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IRewardService, RewardService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<INotificationMapper, NotificationMapper>();
 builder.Services.AddScoped<IRedisBetsCacheService, RedisBetsCacheService>();
 builder.Services.AddScoped<IRedisUserCacheService, RedisUserCacheService>();
@@ -173,7 +174,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("https://localhost:5173")
+        policy.WithOrigins("httpS://localhost:5173")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
