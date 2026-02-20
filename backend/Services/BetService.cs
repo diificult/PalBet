@@ -87,9 +87,10 @@ namespace PalBet.Services
 
                     foreach (BetParticipant p in bet.Participants)
                     {
-                        var current = await _userRepository.GetCoins(p.AppUserId);
+                        var current = p.AppUser.PersonalCoins;
+                        // var current = await _userRepository.GetCoins(p.AppUserId);
                         if (current < bet.Coins)
-                            throw new CustomException($"User {p.AppUser.UserName} does not have enough coins to accept the Bet", "BET_INSUFFICIENT_COINS", 400);
+                            throw new CustomException("BET_INSUFFICIENT_COINS", $"User {p.AppUser.UserName} does not have enough coins to accept the Bet", 400);
 
                     }
 
@@ -355,7 +356,7 @@ namespace PalBet.Services
         {
 
             var bet = await _betRepository.GetByIdAsync(betId);
-            if (bet == null ) throw new CustomException("Bet not found", "BET_NOTFOUND", 404);
+            if (bet == null) throw new CustomException("Bet not found", "BET_NOTFOUND", 404);
             if (bet.Participants.Where(p => p.AppUserId == userId).Any())
             {
                 return bet.ToBetDtoFromBets(userId);

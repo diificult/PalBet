@@ -34,7 +34,6 @@ namespace PalBet.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<UserDto>> Login([FromBody]LoginDto dto)
         {
-            Console.WriteLine("Login Hit");
             var account = await _accountService.LoginAsync(dto);
             return Ok(account);
         }

@@ -49,7 +49,15 @@ namespace PalBet.Services
                     else throw new CustomException("CANNOT_CREATE_ACCOUNT", "Unable to create account, may be an error on server side", 500);
 
                 }
-                else throw new CustomException("CANNOT_CREATE_ACCOUNT", "Unable to create account, may be an error on server side", 500);
+                else
+                {
+                    if (createUser.Errors.Any(e => e.Code == "DuplicateEmail")) throw new CustomException("CANNOT_CREATE_EMAIL_EXISTS", "Unable to create account, may be an error on server side", 409);
+                    else if (createUser.Errors.Any(e => e.Code == "DuplicateUserName")) throw new CustomException("CANNOT_CREATE_USERNAME_EXISTS", "Unable to create account, username exists", 409);
+                    throw new CustomException("CANNOT_CREATE_ACCOUNT", "Unable to create an account, caught error on server side", 500);
+                }
+                }catch (CustomException e)
+            {
+                throw;
             }
             catch (Exception e)
             {
