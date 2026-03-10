@@ -69,7 +69,15 @@
 ## 📝 About The Project
 
 I wanted to expand my ASP.NET knowledge, and start implementing some React skills.
-The website currently allows users to add other users as friends. Once they become friends, you can create "bets" with others, which will notify
+The website currently allows users to add other users as friends. Once they become friends, you can create "bets" with others.
+
+Features
+- JWT authentication
+- background job processing (Hangfire)
+- real-time updates (SignalR)
+- API rate limiting
+
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
